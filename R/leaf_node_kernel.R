@@ -1,0 +1,95 @@
+#' Compute random forest proximity kernel from a leaf node matrix
+#'
+#' Given a matrix of leaf node assignments (observations x trees), computes the
+#' \eqn{n \times n} kernel matrix where entry \eqn{(i,j)} is the proportion of
+#' trees in which observations \eqn{i} and \eqn{j} fall into the same leaf node.
+#'
+#' @param leaf_matrix An integer matrix of dimension \eqn{n \times B}, where
+#'   \code{leaf_matrix[i, b]} is the leaf node ID for observation \code{i} in
+#'   tree \code{b}. Typically produced by \code{\link{get_leaf_node_matrix}}.
+#' @param sparse Logical; if \code{TRUE} (default), returns a sparse
+#'   \code{\link[Matrix:dgCMatrix-class]{dgCMatrix}} from the \pkg{Matrix} package. If
+#'   \code{FALSE}, returns a dense base R matrix.
+#'
+#' @return A symmetric \eqn{n \times n} matrix (sparse or dense depending on
+#'   \code{sparse}) where entry \eqn{(i,j)} equals
+#'   \deqn{K(i,j) = \frac{1}{B} \sum_{b=1}^{B} \mathbf{1}(L_b(i) = L_b(j)),}
+#'   i.e., the fraction of trees where \eqn{i} and \eqn{j} share a leaf.
+#'
+#' @details
+#' For each tree \eqn{b}, the leaf assignment defines a sparse \eqn{n \times
+#' L_b} indicator matrix \eqn{Z_b}. This function stacks all \eqn{B} indicator
+#' matrices column-wise into a single sparse matrix
+#' \eqn{Z = [Z_1 | Z_2 | \cdots | Z_B]} of dimension
+#' \eqn{n \times \sum_b L_b}. The kernel is then obtained via a single sparse
+#' cross-product: \eqn{K = Z Z^\top / B}. Leaf ID remapping is done in C++ for
+#' speed.
+#'
+#' @examples
+#' \donttest{
+#' library(grf)
+#' n <- 100
+#' p <- 5
+#' X <- matrix(rnorm(n * p), n, p)
+#' Y <- cbind(X[, 1] + rnorm(n), X[, 2] + rnorm(n))
+#' forest <- multi_regression_forest(X, Y, num.trees = 50)
+#'
+#' leaf_mat <- get_leaf_node_matrix(forest)
+#' K <- leaf_node_kernel(leaf_mat)               # sparse
+#' K_dense <- leaf_node_kernel(leaf_mat, sparse = FALSE)  # dense
+#' }
+#'
+#' @importFrom Matrix sparseMatrix tcrossprod
+#' @importFrom methods new
+#' @export
+leaf_node_kernel <- function(leaf_matrix, sparse = TRUE) {
+  B <- ncol(leaf_matrix)
+
+  # Build Z via C++ (remap + CSC construction in one step)
+  Z <- leaf_node_kernel_Z(leaf_matrix)
+
+  # Single sparse tcrossprod: K = Z Z^T / B
+  K <- Matrix::tcrossprod(Z) / B
+
+  if (!sparse) {
+    K <- as.matrix(K)
+  }
+
+  K
+}
+
+
+#' Build the sparse indicator matrix Z from a leaf node matrix
+#'
+#' Returns the sparse \eqn{n \times L} indicator matrix \eqn{Z} such that
+#' the proximity kernel is \eqn{K = Z Z^\top / B}. This factored
+#' representation can be passed to \code{\link{kernel_balance}} to enable the
+#' CG solver, which avoids forming the full \eqn{n \times n} kernel.
+#'
+#' @inheritParams leaf_node_kernel
+#'
+#' @return A sparse \code{dgCMatrix} of dimension \eqn{n \times L}, where
+#'   \eqn{L = \sum_b L_b} is the total number of leaves across all trees.
+#'   Each row has exactly \eqn{B} nonzero entries (one per tree).
+#'
+#' @examples
+#' \donttest{
+#' library(grf)
+#' n <- 100
+#' p <- 5
+#' X <- matrix(rnorm(n * p), n, p)
+#' Y <- cbind(X[, 1] + rnorm(n), X[, 2] + rnorm(n))
+#' forest <- multi_regression_forest(X, Y, num.trees = 50)
+#' leaf_mat <- get_leaf_node_matrix(forest)
+#' Z <- leaf_node_kernel_Z(leaf_mat)
+#' }
+#'
+#' @export
+leaf_node_kernel_Z <- function(leaf_matrix) {
+  csc <- build_Z_cpp(leaf_matrix)
+  new("dgCMatrix",
+      i = csc$i,
+      p = csc$p,
+      x = csc$x,
+      Dim = c(csc$nrow, csc$ncol))
+}

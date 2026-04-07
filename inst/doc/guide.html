@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Getting Started with forestBalance</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting Started with forestBalance</h1>
+
+
+
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p><code>forestBalance</code> estimates average treatment effects (ATE)
+in observational studies by combining multivariate random forests with
+kernel energy balancing. The key idea is:</p>
+<ol style="list-style-type: decimal">
+<li>Fit a random forest that jointly predicts treatment <em>and</em>
+outcome from covariates, so that the tree structure captures
+confounding.</li>
+<li>Use the forest’s leaf co-membership to define a similarity
+kernel.</li>
+<li>Obtain balancing weights via a closed-form kernel energy distance
+solution.</li>
+</ol>
+<p>Because the kernel reflects the nonlinear relationships between
+covariates, treatment, and outcome, the resulting weights can balance
+complex confounding structure that linear methods may miss.</p>
+<p>The method is described in:</p>
+<blockquote>
+<p>De, S. and Huling, J.D. (2025). <em>Data adaptive covariate balancing
+for causal effect estimation for high dimensional data.</em>
+arXiv:2512.18069.</p>
+</blockquote>
+</div>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(forestBalance)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">library</span>(WeightIt)</span></code></pre></div>
+</div>
+<div id="simulating-data" class="section level2">
+<h2>Simulating data</h2>
+<p><code>simulate_data()</code> generates observational data with
+nonlinear confounding. The propensity score depends on <span class="math inline">\(X_1\)</span> through a Beta density, and the
+outcome depends nonlinearly on <span class="math inline">\(X_1\)</span>,
+<span class="math inline">\(X_2\)</span>, and <span class="math inline">\(X_5\)</span>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">simulate_data</span>(<span class="at">n =</span> <span class="dv">800</span>, <span class="at">p =</span> <span class="dv">10</span>, <span class="at">ate =</span> <span class="dv">0</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="fu">c</span>(<span class="st">&quot;True ATE&quot;</span>  <span class="ot">=</span> dat<span class="sc">$</span>ate,</span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>  <span class="st">&quot;Naive ATE&quot;</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="fu">mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span> <span class="fu">mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>]), <span class="dv">4</span>))</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;  True ATE Naive ATE </span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt;    0.0000    1.7054</span></span></code></pre></div>
+<p>The naive difference-in-means is badly biased because of
+confounding.</p>
+</div>
+<div id="estimating-the-ate" class="section level2">
+<h2>Estimating the ATE</h2>
+<div id="forest-balance" class="section level3">
+<h3>Forest balance</h3>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>fit_fb <span class="ot">&lt;-</span> <span class="fu">forest_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, dat<span class="sc">$</span>Y, <span class="at">num.trees =</span> <span class="dv">1000</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>fit_fb</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; Forest Kernel Energy Balancing (cross-fitted)</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="co">#&gt;   n = 800  (n_treated = 284, n_control = 516)</span></span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt;   Trees: 1000</span></span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="co">#&gt;   Cross-fitting: 2 folds</span></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="co">#&gt;   Solver: direct</span></span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="co">#&gt;   ATE estimate: 0.0741</span></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co">#&gt;   Fold ATEs: 0.1184, 0.0298</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="co">#&gt;   ESS: treated = 190/284 (67%)   control = 386/516 (75%)</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="co">#&gt; Use summary() for covariate balance details.</span></span></code></pre></div>
+</div>
+<div id="entropy-balancing-weightit" class="section level3">
+<h3>Entropy balancing (WeightIt)</h3>
+<p>Entropy balancing finds weights that exactly balance covariate means
+between treated and control groups:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">A =</span> dat<span class="sc">$</span>A, dat<span class="sc">$</span>X)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>fit_ebal <span class="ot">&lt;-</span> <span class="fu">weightit</span>(A <span class="sc">~</span> ., <span class="at">data =</span> df, <span class="at">method =</span> <span class="st">&quot;ebal&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>ate_ebal <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>], fit_ebal<span class="sc">$</span>weights[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>            <span class="fu">weighted.mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>], fit_ebal<span class="sc">$</span>weights[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>])</span></code></pre></div>
+</div>
+<div id="energy-balancing-weightit" class="section level3">
+<h3>Energy balancing (WeightIt)</h3>
+<p>Energy balancing minimizes the energy distance between the weighted
+treated and control covariate distributions:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>fit_energy <span class="ot">&lt;-</span> <span class="fu">weightit</span>(A <span class="sc">~</span> ., <span class="at">data =</span> df, <span class="at">method =</span> <span class="st">&quot;energy&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>ate_energy <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>], fit_energy<span class="sc">$</span>weights[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>              <span class="fu">weighted.mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>], fit_energy<span class="sc">$</span>weights[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>])</span></code></pre></div>
+</div>
+<div id="comparison" class="section level3">
+<h3>Comparison</h3>
+<table>
+<caption>Single-replication ATE estimates.</caption>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="right">ATE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Naive</td>
+<td align="right">1.7054</td>
+</tr>
+<tr class="even">
+<td align="left">Entropy balancing</td>
+<td align="right">1.1515</td>
+</tr>
+<tr class="odd">
+<td align="left">Energy balancing</td>
+<td align="right">1.0032</td>
+</tr>
+<tr class="even">
+<td align="left">Forest balance</td>
+<td align="right">0.0741</td>
+</tr>
+<tr class="odd">
+<td align="left">Truth</td>
+<td align="right">0.0000</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="covariate-balance" class="section level2">
+<h2>Covariate balance</h2>
+<p><code>summary()</code> shows the full balance comparison. Let’s also
+check balance on nonlinear transformations of the covariates, since the
+confounding operates through the Beta density:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>X <span class="ot">&lt;-</span> dat<span class="sc">$</span>X</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>X.nl <span class="ot">&lt;-</span> <span class="fu">cbind</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  X[, <span class="dv">1</span>]<span class="sc">^</span><span class="dv">2</span>, X[, <span class="dv">2</span>]<span class="sc">^</span><span class="dv">2</span>, X[, <span class="dv">5</span>]<span class="sc">^</span><span class="dv">2</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  X[, <span class="dv">1</span>] <span class="sc">*</span> X[, <span class="dv">2</span>], X[, <span class="dv">1</span>] <span class="sc">*</span> X[, <span class="dv">5</span>],</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>  <span class="fu">dbeta</span>(X[, <span class="dv">1</span>], <span class="dv">2</span>, <span class="dv">4</span>), <span class="fu">dbeta</span>(X[, <span class="dv">5</span>], <span class="dv">2</span>, <span class="dv">4</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>)</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="fu">colnames</span>(X.nl) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;X1^2&quot;</span>, <span class="st">&quot;X2^2&quot;</span>, <span class="st">&quot;X5^2&quot;</span>, <span class="st">&quot;X1*X2&quot;</span>, <span class="st">&quot;X1*X5&quot;</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>                     <span class="st">&quot;Beta(X1)&quot;</span>, <span class="st">&quot;Beta(X5)&quot;</span>)</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="fu">summary</span>(fit_fb, <span class="at">X.trans =</span> X.nl)</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; Forest Kernel Energy Balancing</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; ============================================================ </span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt;   n = 800  (n_treated = 284, n_control = 516)</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt;   Trees: 1000</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt;   Solver: CG (kernel not materialized)</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt;   ATE estimate: 0.0741</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt; ============================================================ </span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt; Covariate Balance (|SMD|)</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt; ------------------------------------------------------------ </span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a><span class="co">#&gt;   Covariate     Unweighted      Weighted</span></span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt;   ----------  ------------  ------------</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt;   X1              0.2467 *        0.0082</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt;   X2                0.0052        0.0178</span></span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a><span class="co">#&gt;   X3                0.0690        0.0167</span></span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a><span class="co">#&gt;   X4                0.0096        0.0036</span></span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a><span class="co">#&gt;   X5                0.0382        0.0286</span></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a><span class="co">#&gt;   X6                0.0633        0.0236</span></span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="co">#&gt;   X7                0.0354        0.0375</span></span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a><span class="co">#&gt;   X8                0.0040        0.0236</span></span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a><span class="co">#&gt;   X9              0.1140 *        0.0083</span></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a><span class="co">#&gt;   X10             0.1740 *      0.1085 *</span></span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a><span class="co">#&gt;   ----------  ------------  ------------</span></span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a><span class="co">#&gt;   Max |SMD|         0.2467        0.1085</span></span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a><span class="co">#&gt;   (* indicates |SMD| &gt; 0.10)</span></span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a><span class="co">#&gt; Transformed Covariate Balance (|SMD|)</span></span>
+<span id="cb6-39"><a href="#cb6-39" tabindex="-1"></a><span class="co">#&gt; ------------------------------------------------------------ </span></span>
+<span id="cb6-40"><a href="#cb6-40" tabindex="-1"></a><span class="co">#&gt;   Transform     Unweighted      Weighted</span></span>
+<span id="cb6-41"><a href="#cb6-41" tabindex="-1"></a><span class="co">#&gt;   ----------  ------------  ------------</span></span>
+<span id="cb6-42"><a href="#cb6-42" tabindex="-1"></a><span class="co">#&gt;   X1^2            0.1769 *        0.0440</span></span>
+<span id="cb6-43"><a href="#cb6-43" tabindex="-1"></a><span class="co">#&gt;   X2^2              0.0125        0.0061</span></span>
+<span id="cb6-44"><a href="#cb6-44" tabindex="-1"></a><span class="co">#&gt;   X5^2              0.0453        0.0548</span></span>
+<span id="cb6-45"><a href="#cb6-45" tabindex="-1"></a><span class="co">#&gt;   X1*X2             0.0397        0.0284</span></span>
+<span id="cb6-46"><a href="#cb6-46" tabindex="-1"></a><span class="co">#&gt;   X1*X5             0.0407        0.0009</span></span>
+<span id="cb6-47"><a href="#cb6-47" tabindex="-1"></a><span class="co">#&gt;   Beta(X1)        0.7025 *        0.0258</span></span>
+<span id="cb6-48"><a href="#cb6-48" tabindex="-1"></a><span class="co">#&gt;   Beta(X5)        0.1256 *        0.0041</span></span>
+<span id="cb6-49"><a href="#cb6-49" tabindex="-1"></a><span class="co">#&gt;   ----------  ------------  ------------</span></span>
+<span id="cb6-50"><a href="#cb6-50" tabindex="-1"></a><span class="co">#&gt;   Max |SMD|         0.7025        0.0548</span></span>
+<span id="cb6-51"><a href="#cb6-51" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-52"><a href="#cb6-52" tabindex="-1"></a><span class="co">#&gt; Effective Sample Size</span></span>
+<span id="cb6-53"><a href="#cb6-53" tabindex="-1"></a><span class="co">#&gt; ------------------------------------------------------------ </span></span>
+<span id="cb6-54"><a href="#cb6-54" tabindex="-1"></a><span class="co">#&gt;   Treated: 190 / 284  (67%)</span></span>
+<span id="cb6-55"><a href="#cb6-55" tabindex="-1"></a><span class="co">#&gt;   Control: 386 / 516  (75%)</span></span>
+<span id="cb6-56"><a href="#cb6-56" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb6-57"><a href="#cb6-57" tabindex="-1"></a><span class="co">#&gt; Energy Distance</span></span>
+<span id="cb6-58"><a href="#cb6-58" tabindex="-1"></a><span class="co">#&gt; ------------------------------------------------------------ </span></span>
+<span id="cb6-59"><a href="#cb6-59" tabindex="-1"></a><span class="co">#&gt;   Unweighted: 0.0397</span></span>
+<span id="cb6-60"><a href="#cb6-60" tabindex="-1"></a><span class="co">#&gt;   Weighted:   0.0173</span></span>
+<span id="cb6-61"><a href="#cb6-61" tabindex="-1"></a><span class="co">#&gt; ============================================================</span></span></code></pre></div>
+<p>We can use <code>compute_balance()</code> to compare all methods on
+the same terms:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>bal_fb     <span class="ot">&lt;-</span> <span class="fu">compute_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, fit_fb<span class="sc">$</span>weights, <span class="at">X.trans =</span> X.nl)</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>bal_ebal   <span class="ot">&lt;-</span> <span class="fu">compute_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, fit_ebal<span class="sc">$</span>weights, <span class="at">X.trans =</span> X.nl)</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>bal_energy <span class="ot">&lt;-</span> <span class="fu">compute_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, fit_energy<span class="sc">$</span>weights, <span class="at">X.trans =</span> X.nl)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>bal_unwtd  <span class="ot">&lt;-</span> <span class="fu">compute_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, <span class="fu">rep</span>(<span class="dv">1</span>, dat<span class="sc">$</span>n), <span class="at">X.trans =</span> X.nl)</span></code></pre></div>
+<table>
+<caption>Balance diagnostics across methods.</caption>
+<colgroup>
+<col width="22%" />
+<col width="21%" />
+<col width="25%" />
+<col width="15%" />
+<col width="15%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="right">Max SMD (linear)</th>
+<th align="right">Max SMD (nonlinear)</th>
+<th align="left">ESS treated</th>
+<th align="left">ESS control</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Unweighted</td>
+<td align="right">0.2467</td>
+<td align="right">0.7025</td>
+<td align="left">100%</td>
+<td align="left">100%</td>
+</tr>
+<tr class="even">
+<td align="left">Entropy balancing</td>
+<td align="right">0.0000</td>
+<td align="right">0.6375</td>
+<td align="left">94%</td>
+<td align="left">98%</td>
+</tr>
+<tr class="odd">
+<td align="left">Energy balancing</td>
+<td align="right">0.0123</td>
+<td align="right">0.5748</td>
+<td align="left">84%</td>
+<td align="left">87%</td>
+</tr>
+<tr class="even">
+<td align="left">Forest balance</td>
+<td align="right">0.1085</td>
+<td align="right">0.0548</td>
+<td align="left">67%</td>
+<td align="left">75%</td>
+</tr>
+</tbody>
+</table>
+<p>All three weighting methods reduce the linear covariate imbalance.
+Both energy balancing the forest balance approach also reduce imbalance
+on <em>nonlinear</em> functions of the covariates, as they both aim to
+balance the joint distributions of covariates, however, forest balancing
+over-emphasizes full distributional balance of confounders specifically
+rather than all possible covariates.</p>
+</div>
+<div id="simulation-study" class="section level2">
+<h2>Simulation study</h2>
+<p>A simulation study with 100 replications at two sample sizes (<span class="math inline">\(n = 500\)</span> and <span class="math inline">\(n
+= 1{,}000\)</span>) demonstrates how the methods compare and how
+performance changes with <span class="math inline">\(n\)</span>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>run_sim <span class="ot">&lt;-</span> <span class="cf">function</span>(n, <span class="at">nreps =</span> <span class="dv">50</span>, <span class="at">num.trees =</span> <span class="dv">500</span>, <span class="at">seed =</span> <span class="dv">1</span>) {</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="fu">set.seed</span>(seed)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  methods <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Naive&quot;</span>, <span class="st">&quot;Entropy&quot;</span>, <span class="st">&quot;Energy&quot;</span>, <span class="st">&quot;Forest&quot;</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  results <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, nreps, <span class="fu">length</span>(methods), <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, methods))</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>  <span class="cf">for</span> (r <span class="cf">in</span> <span class="fu">seq_len</span>(nreps)) {</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>    dat <span class="ot">&lt;-</span> <span class="fu">simulate_data</span>(<span class="at">n =</span> n, <span class="at">p =</span> <span class="dv">10</span>, <span class="at">ate =</span> <span class="dv">0</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    df  <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">A =</span> dat<span class="sc">$</span>A, dat<span class="sc">$</span>X)</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a></span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>    fit_fb <span class="ot">&lt;-</span> <span class="fu">forest_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, dat<span class="sc">$</span>Y, <span class="at">num.trees =</span> num.trees)</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a></span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    w_ebal   <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(<span class="fu">weightit</span>(A <span class="sc">~</span> ., <span class="at">data =</span> df, <span class="at">method =</span> <span class="st">&quot;ebal&quot;</span>)<span class="sc">$</span>weights,</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>                          <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">rep</span>(<span class="dv">1</span>, dat<span class="sc">$</span>n))</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>    w_energy <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(<span class="fu">weightit</span>(A <span class="sc">~</span> ., <span class="at">data =</span> df, <span class="at">method =</span> <span class="st">&quot;energy&quot;</span>)<span class="sc">$</span>weights,</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a>                          <span class="at">error =</span> <span class="cf">function</span>(e) <span class="fu">rep</span>(<span class="dv">1</span>, dat<span class="sc">$</span>n))</span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>    results[r, <span class="st">&quot;Naive&quot;</span>]   <span class="ot">&lt;-</span> <span class="fu">mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span> <span class="fu">mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>    results[r, <span class="st">&quot;Entropy&quot;</span>] <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>], w_ebal[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span></span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>                              <span class="fu">weighted.mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>], w_ebal[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>    results[r, <span class="st">&quot;Energy&quot;</span>]  <span class="ot">&lt;-</span> <span class="fu">weighted.mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>], w_energy[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span></span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>                              <span class="fu">weighted.mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>], w_energy[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>    results[r, <span class="st">&quot;Forest&quot;</span>]  <span class="ot">&lt;-</span> fit_fb<span class="sc">$</span>ate</span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a>  }</span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a>  results</span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a>}</span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a></span>
+<span id="cb8-27"><a href="#cb8-27" tabindex="-1"></a>res_500  <span class="ot">&lt;-</span> <span class="fu">run_sim</span>(<span class="at">n =</span> <span class="dv">500</span>,  <span class="at">seed =</span> <span class="dv">1</span>)</span>
+<span id="cb8-28"><a href="#cb8-28" tabindex="-1"></a>res_1000 <span class="ot">&lt;-</span> <span class="fu">run_sim</span>(<span class="at">n =</span> <span class="dv">1000</span>, <span class="at">seed =</span> <span class="dv">1</span>)</span></code></pre></div>
+<table>
+<caption>Simulation results (50 reps, true ATE = 0).</caption>
+<thead>
+<tr class="header">
+<th align="right">n</th>
+<th align="left">Method</th>
+<th align="right">Bias</th>
+<th align="right">SD</th>
+<th align="right">RMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">500</td>
+<td align="left">Naive</td>
+<td align="right">1.2495</td>
+<td align="right">0.3097</td>
+<td align="right">1.2873</td>
+</tr>
+<tr class="even">
+<td align="right">500</td>
+<td align="left">Entropy</td>
+<td align="right">0.9682</td>
+<td align="right">0.2222</td>
+<td align="right">0.9934</td>
+</tr>
+<tr class="odd">
+<td align="right">500</td>
+<td align="left">Energy</td>
+<td align="right">0.8459</td>
+<td align="right">0.2222</td>
+<td align="right">0.8746</td>
+</tr>
+<tr class="even">
+<td align="right">500</td>
+<td align="left">Forest</td>
+<td align="right">0.0736</td>
+<td align="right">0.1585</td>
+<td align="right">0.1748</td>
+</tr>
+<tr class="odd">
+<td align="right">1000</td>
+<td align="left">Naive</td>
+<td align="right">1.3102</td>
+<td align="right">0.2441</td>
+<td align="right">1.3328</td>
+</tr>
+<tr class="even">
+<td align="right">1000</td>
+<td align="left">Entropy</td>
+<td align="right">0.9841</td>
+<td align="right">0.1554</td>
+<td align="right">0.9963</td>
+</tr>
+<tr class="odd">
+<td align="right">1000</td>
+<td align="left">Energy</td>
+<td align="right">0.8107</td>
+<td align="right">0.1478</td>
+<td align="right">0.8240</td>
+</tr>
+<tr class="even">
+<td align="right">1000</td>
+<td align="left">Forest</td>
+<td align="right">0.0524</td>
+<td align="right">0.0969</td>
+<td align="right">0.1101</td>
+</tr>
+</tbody>
+</table>
+<div class="float">
+<img role="img" aria-label="plot of chunk sim-plot" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAdQAAAFECAYAAACeQc8vAAAEDmlDQ1BrQ0dDb2xvclNwYWNlR2VuZXJpY1JHQgAAOI2NVV1oHFUUPpu5syskzoPUpqaSDv41lLRsUtGE2uj+ZbNt3CyTbLRBkMns3Z1pJjPj/KRpKT4UQRDBqOCT4P9bwSchaqvtiy2itFCiBIMo+ND6R6HSFwnruTOzu5O4a73L3PnmnO9+595z7t4LkLgsW5beJQIsGq4t5dPis8fmxMQ6dMF90A190C0rjpUqlSYBG+PCv9rt7yDG3tf2t/f/Z+uuUEcBiN2F2Kw4yiLiZQD+FcWyXYAEQfvICddi+AnEO2ycIOISw7UAVxieD/Cyz5mRMohfRSwoqoz+xNuIB+cj9loEB3Pw2448NaitKSLLRck2q5pOI9O9g/t/tkXda8Tbg0+PszB9FN8DuPaXKnKW4YcQn1Xk3HSIry5ps8UQ/2W5aQnxIwBdu7yFcgrxPsRjVXu8HOh0qao30cArp9SZZxDfg3h1wTzKxu5E/LUxX5wKdX5SnAzmDx4A4OIqLbB69yMesE1pKojLjVdoNsfyiPi45hZmAn3uLWdpOtfQOaVmikEs7ovj8hFWpz7EV6mel0L9Xy23FMYlPYZenAx0yDB1/PX6dledmQjikjkXCxqMJS9WtfFCyH9XtSekEF+2dH+P4tzITduTygGfv58a5VCTH5PtXD7EFZiNyUDBhHnsFTBgE0SQIA9pfFtgo6cKGuhooeilaKH41eDs38Ip+f4At1Rq/sjr6NEwQqb/I/DQqsLvaFUjvAx+eWirddAJZnAj1DFJL0mSg/gcIpPkMBkhoyCSJ8lTZIxk0TpKDjXHliJzZPO50dR5ASNSnzeLvIvod0HG/mdkmOC0z8VKnzcQ2M/Yz2vKldduXjp9bleLu0ZWn7vWc+l0JGcaai10yNrUnXLP/8Jf59ewX+c3Wgz+B34Df+vbVrc16zTMVgp9um9bxEfzPU5kPqUtVWxhs6OiWTVW+gIfywB9uXi7CGcGW/zk98k/kmvJ95IfJn/j3uQ+4c5zn3Kfcd+AyF3gLnJfcl9xH3OfR2rUee80a+6vo7EK5mmXUdyfQlrYLTwoZIU9wsPCZEtP6BWGhAlhL3p2N6sTjRdduwbHsG9kq32sgBepc+xurLPW4T9URpYGJ3ym4+8zA05u44QjST8ZIoVtu3qE7fWmdn5LPdqvgcZz8Ww8BWJ8X3w0PhQ/wnCDGd+LvlHs8dRy6bLLDuKMaZ20tZrqisPJ5ONiCq8yKhYM5cCgKOu66Lsc0aYOtZdo5QCwezI4wm9J/v0X23mlZXOfBjj8Jzv3WrY5D+CsA9D7aMs2gGfjve8ArD6mePZSeCfEYt8CONWDw8FXTxrPqx/r9Vt4biXeANh8vV7/+/16ffMD1N8AuKD/A/8leAvFY9bLAAAAOGVYSWZNTQAqAAAACAABh2kABAAAAAEAAAAaAAAAAAACoAIABAAAAAEAAAHUoAMABAAAAAEAAAFEAAAAAGrC1lQAAEAASURBVHgB7Z0HnBRF+vcf2AAsS1oyCCvhBBVBooIkwXAi6nsgyklGOfRP8hA8ooKSBEQFFdQTOIkSDkUQ9QAPDxQRREAySmZJu+ySdlk2vPMr7GFmdmZ2Qs9M98yvPts73dUVnvpWdT+VuqpArsUIDQmQAAmQAAmQgF8ECvrlm55JgARIgARIgAQUASpUFgQSIAESIAES0IEAFaoOEBkECZAACZAACVChsgyQAAmQAAmQgA4EonUII6hBYA5VTk5OUONkZCRAAiRAAiSgEYiKitJO7X5Np1DHjh0rqampUqBAAbuE8IIESIAESIAEAk1gz5498uWXX4ozpWo6hQpY3bp1k+hoU4oe6Lxm+CRAAiRAAgEkMHfuXJehcwzVJRreIAESIAESIAHPCVChes6KLkmABEiABEjAJQEqVJdoeIMESIAESIAEPCdAheo5K7okARIgARIgAZcEOLPHJRreIIHwJbBz50756KOPrAkcNGiQVK5cWZYsWSJbt26Vdu3aySOPPKLuw+3ChQuldOnS0qVLF6lUqZLVH09IgARuEmAL9SYLnpGA6Qhcu3Ytj8zZ2dmSmZlpd8DO1vz6669y+fJladGihTpKlCghy5cvl7Vr10rnzp3lrbfekl9++UXS09Nl9OjRUqdOHbl69apMnTrVNhiekwAJ2BBgC9UGBk9JwAwEZs6cKXv37lUK8fjx49KxY0d5/vnnraJv2LBBJkyYYL3GSd++faVTp05Wu4MHD0p8fLxSkm3btpWyZcvKjh07pG7dunLfffepVigUKr61u3Llijz44IOqBYtwoZydfYNnDZwnJBChBKhQIzTjmWzzEsBKYSdPnpQ5c+bIypUrZdmyZXYKtUmTJnbduUhpQkKCXYKhJLE4yvnz56V3796yYMECtWBKjRo1lDso27S0NGUHi2LFiknRokUFK5VdvHhRSpUqZRceL0iABESoUFkKSMCEBDDeWbx4calQoYI4dvtiDHTKlCl2qXr22WelQ4cOVrvJkydbz3/66Sf57rvvlMJEFy8MunehVKFEYTIyMlT3L841O5zTkAAJ3CRAhXqTBc9IwDQEYmJilKwFC+adBlGvXj0ZP368XVpsJxKhlTls2DBp3LixGj/FUp5Vq1aV6tWry/79+yU5OVnOnj0raK0mJiYK4oD9gQMHlLvY2Fi7sHlBAiRwgwAVKksCCYQZAXTHuuuSRVcvZvHOmjVLPvzwQ6VUGzRooJTnjBkz1NKebdq0UfYYKx0wYICapIQWa//+/cOMFpNDAvoRKGCprebqF1zgQxozZow89thjXMs38KgZQ5gTwKOPrtwiRYrYpRQzhB1bodevX1fPHDelsEPFiwgkgLV8Mdvd2cQ8tlAjsEAwySQAAlCOjsoU9o7KFHZaFzPOaUiABJwTyDsA49wdbUmABEiABEiABNwQoEJ1A4e3SIAESIAESMBTAqbs8k1KSuIYqqc5THckQAIkQAK6EcA33K6M6RRqxYoV5bPPPnOVnqDYYzKHkSdn4MN/yGdUGbV5cEaVj/z8e4yMnr9mkA8yOvskyr+c0c835DPq8wvZAs3PVdpNp1BTUlIEU/tDOUkCK8Vg5RhXUPUrtr6FhNVv4uLi1OFbCIH1hRpeoUKFDNvLcOHCBSUb8tiIBjNzUfbA0IgGzwcqJSVLljSieIIZyzjwjBjR4PlAHmMzAiMa5C3WgcbCIkY0YIcyWK5cuYCIN2nSJKWwnQVuOoWKRGC6cnR06ERH3DiMqlA1+ULJyFlh0+won0bCt1+t7Bk5f/HSNap8WgvGqPJBLu3wrYQE1peWt5HKz13PASclBbbsMXQSIAESIIEIIUCFGoYZjS24Dh06FIYpY5JIgARIwLgEqFCNmzc+S7Zt2za1G4nPAdAjCZAACZCA1wRCNxDptaj04AmB06dPy9GjR2Xe/AWyZNm/8/WCZeZyc3Ms49I3xm3y9fCHg4KWSTHP9u4pzZo189QL3ZEACZBAWBOgQg2z7MUMwUuXLsnl2Apy6eKNHUncJTHj6M+Se+2yRCfcKjFlbuyF6c69di/75FZp/+gZ7ZK/JEACJBDxBKhQw7QIxJSpKUXiq+WbusykXyUbCrVkFSlSvXm+7jUHmRcOaqf8JQESIAESsBDgGGoYFoMjR47I1bgqYZgyJokESIAEjEuACtW4eeOzZPhOTApE+eyfHkmABEiABLwnQIXqPTP6IAESIAESIIE8BKhQ8yChBQmQAAmQAAl4T4AK1XtmhveBTaMLZqcbXk4KSAIkQALhRIAKNZxy84+0YEeewhn8pCUMs5ZJIgESMDABrz+b+fzzz2Xp0qV2u72MGzdOKleurFsyV61aJe3bt9ctPAZEAiRAAiRAAoEm4HULFdv2QNnNmTPHetgq06ysrDwyY6skzWRnZ+fZ+iY9PV1t96S5Wbx4sXYasN/nn39eateuLVOnTg1YHAzYOAS2bNki99xzj8rztm3bSq1atWTXrl3GEZCSkAAJmJ6A1y1UVyneuHGjLFmyRDB+V7NmTenTp4989dVXsnr1aklOTpaJEyfKjz/+KDt37lR7EbZr105atWolaN1evXpVsIdnly5d1D57586dk3nz5km3bt1UdNOmTVPXuLjzzjvlzJkzdi1kVzK5sseL9IcfflCKff78+dK1a1dXTp3aY/snyGxrZs6cKWi9h9rgkxnbCk6g5EHFaPTo0TJ27NhAReE2XFTo0LXtqenXr5/aIxHuT5w4obwNHjzYWq5sw0H+wmDVKSMaTT6jbh+oyYd9KY1oNPmwZ6YRjSYflhE1qoGMju9Ao8gaaH7u3gs+KVS0IL/++mvFr1GjRoKXFezefPNNtenxiBEj5NixY6rViU1esSE4lsPbvHmzQDnipY+XWfPmzVUrAa1EbOZ8+PBhpWQXLVpkVaaI5K9//as88MADKj50NyckJPilUOvXr6/2VEWcCAuHNwZAsTmx7Qutd+/e8vjjj3sTTEDcnjx5Ul577TUpXC2wmxNjT8Bnn31WWrZs6XU6sH4w9rTF4av505/+JLGxsR57h6zTp08XyI0eE+T9o48+6jTvUVYhm1E3oAY/lL2YmPyXlvQYkI4O8XzgpRYfH69jqPoFhV40HIULF9YvUB1DQkXk2rVrUqJECR1D1S8oTZkWLVpUv0B1DAnPB8pgqVKldAz1ZlDuyo1PCrVz586CQzMpKSnqASpUqJCyqlOnjmzdulUV2MTERGW3fft2SUpKkmHDhqlrbE6bmpqqlPHkyZMlLS1NevTooQVp94uWiNYaQYsXLxJvXqZ2gVkuypQpo5Q7ZESFwNuwUODhx1ahIp1aWh3jC+Z1yZIlVeUlOrqYFAhgxEj7rbfeKg0bNvQ6FhR2lJVgblCMLn5UpJD3yDuUxSZNmjiVHUoXCtXbcuE0sABYokIK/kaVD88HZDSqfNpza1T5UOFDGTSqfMjbSH4+3DUEfFKoju8ItPBQo0LNAIVg9+7dqrWGrl4tcihZvMwmTZqkHrZPPvlEvVRPnTqlWrB4wb300kuC8S2twDvGo+c15OROKXoSNX5YGEPVTJUqXJpRY8FfEiABfQjoolAhCsYh0dWLsbXy5ctL48aN1RiqJiaULuyGDx+uFCpaC+gSwnjoqFGjVKvqL3/5i3KOrg50Aw8ZMkTzzl8SIAESIAESMDQBrxUqJg45M61btxYcaKlqXb+YeGRrunfvrsYuYKd19w0aNEi1bNEq1caE3n33XWVn65fnJEACJEACJGBkAl5/NpNfYjRl6sodFKmmTDU36H7VlKmtnXbOX+8IVKtWTeKuHvPOE12TAAmQAAn4RUB3heqXNPSsCwE1Bp1r2XGGhgRIgARIIGgEqFCDhpoRkQAJkAAJhDMBKtRwzl2mjQRIgARIIGgEvJ6UFDTJGJHPBLCCSc61dMnKPpVvGLnZN5aKzLl2SbLS8nevBZidlamd8pcESIAESMBCgAo1zIoBPghPxkIbyR4ug2j5SLugZRGD7DO/ytWzezymYZmUrT4+99gDHZIACZBAmBOgQg2zDMYM3/9++61aNs+oS+eFGXImhwRIgAQUAY6hsiCQAAmQAAmQgA4EqFB1gMggSIAESIAESIAKNQzLADZo37t3bximjEkiARIgAeMSoEI1bt74LBk2Jzh79qzP/umRBEiABEjAewKclOQ9M/oggZARwFrZOIKxI5MviTTqlmO+pIV+SMBbAlSo3hKjexIIIYG2bVrLufMpIZTAfdTr1q2T4sWLu3fEuyQQpgSoUMM0Y5ms8CSQm5MlvVulS80KNxbk8DaVryyNl6ycAtLpnnSpf6tvYTiLMyurgLyyPN7ZLdqRQMQQoEINw6weOnSoFC1aNAxTxiSBQIm4HClbLNc3GJYFOWCKFxbfw7gRhN3/zCwf5bELhRckYG4CnJRk7vxzKj1WSzLqGJtTgWlJAiRAAmFAgAo1DDKRSSABEiABEgg9ASrU0OcBJSABEiABEggDAlSoYZCJjknYv3+/nDt3ztGa1yRAAiRAAgEkQIUaQLihCvqzzz6TPXs83zkmVHIyXhIgARIIJwIezfIdO3as/P7773bbdY0cOVJq1qwZTiyYFhIgARIgARLwmYBHCjXFsr/mmDFjBFuDOTNZWTe+Z4uOvhlcdna2UsC2s03hDjNQccDg2taPs7BpRwK2BC5fviwbNmyQ1q1b89MgWzA8DxqBHMsewl999ZXUqlVLatSoEbR4GZHxCdzUgD7I+s033wgOFLAzZ85I//79pWnTprJkyRLZuXOnXL9+Xdq1ayetWrWSvn37SkxMjFLKTzzxhIwfP16qVKmilGr9+vWlUKFCkpqaKt27d5e0tDQZPXq0TJ8+XUn122+/yYkTJ9T5xYsX1dJriDNUBhUBLP9mZIMKTUZGhiFFRLmA0SpingoJ9y1btlTOUVFbs2aN3ao8p06dUj0pnobnyl16erqq9KFMGs1kZWUbTSQ7eTZt2iTx8fGSm5srhQtbPnY1oMG7A88H3kfemoYNG8qoUaPkhx9+kCtXrsgnn3wi9erV8zYYt+5RziGjUZ9f5C1kNKp8eL9AxkDJ5+695bFChYLT1ulEQfzggw9UpqNkTJs2TXbs2CEYu6tTp45s3rxZ2aFQDB48WCnU5ORkeeedd6Ry5coyaNAgGTZsmKrhTZgwQRXu+++/XwYMGKAUKpYvw7Vm/vOf/8inn36qLqtWrSpQqr48DFp4/v4iXcg029a3v2Hq6b99+/ZSpkwZxUnPcPUKC/x8WY8WlSo8KFevXlX5j00A7rzzTqtY3333ncyePdt6HY4nmZnGrsihEhwVFRWO6FWakL5du3YpZYreNbyrXPXc+QoBzwfKOd5zRjSQDYc7xRJKuSEbGAaKX2ZmpsvkeaxQX3/9dacF56677lKBY/1ORLR9+3ZJSkpSChM3UOigTKEAoUxh0JrVukpuv/129XItVqyYJCYmyr59+2T9+vUyceJE5Rb/nn/+eXXgHPZly5a1KnfYBdsgoyCvURUqutTj4uLUEWw2nsSHmj1af95295crV06ee+45ee+996Rz5852lS7E27NnT3V4IoM7NxcuXFCyIY+NZu5r2tgiUprRxLLKg4ov3gV4oZUsWdJqb6QTVIZx4BnxxaD8Pfnkk6plOmTIEN3fRXg+0LoqXbq0L+IF3A/yFkMvRl2zGezwjsb7IhDGXbnxWKG6EkwbD9Xuo4WK1tGkSZPUQ4UukRIlSljHTeEOXSRoXeAXLdvatWsr7+geXrRokSQkJCiFpYXJXxLQCPTr109w0JBAqAigEYFP02hIwJGAxwoV4wZaly8C6dWrl2NY6hrKsHHjxjJ8+HClUDE+6tgS6datm8yZM0eWLl2qWqdauPD3xhtvCNaipSEBEiABEiABMxHwSKFi7DM/g3EETDSCwcQirX9dU6YLFiywBnHw4EE1XoouobffftvaFYyuhPLly0uTJk2sbnniPQFwxDgCDQmQAAmQQPAIBGxhByhSTZk6JqdUqVKCyUhoiWLcFTPnjh49qlq9HTt2DOtJDY4sAnE9ZcoUwQQdGhIgARIggeAR8KiFqrc4d999t+CwNZiQNG/ePFsrnpMACZAACZCAaQgErIVqGgIUlARIgARIgAR0IECFqgNEBkECJEACJEACVKhhWAaw2EGgvsEKQ1xMEgmQAAnoQiAkY6i6SM5AXBLASknuPj526ZE3TEHgf/tiZc9J35betEwAV2bL79Fy4oJ+9WktXFMApJAkECACVKgBAstgSSAQBNq1f0JSUpKlgCXwggW9X+LvkVtubGSB5QH1Xunr/9UowIpcIDKdYZqGABWqabKKgpKAyMiRo9SydFCGRly8H3kUqDVUmf8kYHQC+vX5GD2llI8ESIAESIAEAkiACjWAcEMV9PLly+XXX38NVfSMlwRIgAQikgAVahhm+6FDh9QOP2GYNCaJBEiABAxLgArVsFlDwUiABEiABMxEgJOSzJRblJUEdCKAPYl/+OEHnUKzDyY9PV3tNFW0aFH7Gy6uKlasKPfcc4+Lu7QmAfMQoEI1T155LCm2w8NnETQk4IrAvn37ZNSIYXJbae/KyYX0HMERG1VAbinhwq+205FlJnJ+5tyVHKl3Twsq1PxA8b4pCFChmiKbvBPy73//O78H9A5ZRLouGx8tS5v/5lXa391TQt7fV0Iqx12z+D3tlV9njmfuKy77NAXszAHtSMBEBDiGaqLMoqgkQAIkQALGJUCFaty8oWQkQAIkQAImIkCFaqLMoqgkQAIkQALGJUCFaty88VmynTt3SlJSks/+6ZEESIAESMB7AlSo3jMzvI81a9bIgQMHDC8nBSQBEiCBcCJAhRpOucm0kAAJkAAJhIyAy89mli1bJp999pnExMRYhevYsaNgr01nZtOmTXLHHXdIqVKlnN2mHQmQAAmQAAmENQGXCvXy5cvSoUMHdbgicO3aNesWUitWrJDq1atbnV6/ft1OGWdlZUl0tH10tv6tHnlCAkEggC3Ghg0bJiVLlpRx48ZZ9hZlZ00QsEdUFHiHjhw5UrDQyqRJk3xebOXkyZPy8ssvS+vWraVPnz4RxdBsibXXcB5IjyXLXnnlFbVwwJUrV6RJkybStGlTwYLsM2bMkIEDB6r7WH6sc+fOUqJECVmyZIkUKVJEatasqQrE5MmTBeGg9YtCN3HiRPn2228lNTVVunfvLmlpaTJ69GiZPn26kmj16tXyv//9T53jRYj7ti1nD8TW1QkqCzk5ObqGqWdgnTp1koSEBMVTz3D1CguVK1SmQqnE0NNy7tw59bKrVq2agJlmkL+QMTs7W7Oy+0XPDSZ+hcrk/rEQgj8bhJ89e9YwZRjj/YMHDw4aTj342QqLd9vQoUNtrdQ5evROnDih3lW33nqrdOnSJY8bZxZa2cP7EKZNmzbqd8+ePVKlShW599571XWo/oEfZNTkC5UcruLFc4v3c6Dkw7vLlXGrUOfPny+rVq2y+kVtKz4+Xo4ePWq1f+aZZ+S5555TynLAgAEC2CkpKfLpp5+qGln//v3lzTffVC3ZESNGyLFjx9SLCor46aefFmw1Brc4h38o1HXr1sn9999vjRdrgkJBwECJ40UcypcxXmShjN8KxsVJYmKi6g0wqowav1DKV69ePVXOtJeroyyajM4Q25ZHZ/cDbadV5hxl9iZeVHjzXxjQmxB9dxsTE219vn0PxXOfyHMw1Gt5zsKFCzt9H9StW1dOnTqlBIMC8jS/tIqS5h4VvsOHDwvyDGVPs/c8xfq6BD93z4e+sXkfmh7Ph7tYtfxx5satQu3atWueLl+0LGvXrm3tvnXWUkQtCoUVihXwCxUqpOKuU6eObN261XqOk1q1agnGa4sVKyZQBFhjdP369arVqhxa/qGrAwcMWrNwi26UUBm0kiGDO7Chkg3xZmZmqh6BuLi4UIrhMm5UilAmHIcAXHoIwA1U8vr16yctW7aUHj162MWAGi5kQx47M7atWWf3A22XkZGhyp72XPkS34YNG2TMthu9Pr7419NPtWrVZdSoUXoG6TYs9EDgCPTz8cYbb6gGAFqUvXr18vh9gecDeVy8eHGVjoULF6oWPMpdixYt3KYtGDehsNCzqMkXjDi9iQPsUIEJlHzudI9bheoqEc5qSFCgWs1Fq/mhVYnmMV7wEGL37t3y+OOPy/79+9VnHXfeeaegGwOKFKZdu3ayaNEiVVt19TJzJRPtScAbAmhVfPzxx954oVsS8IoA3nkffvihV36cOcZ7dO7cuc5u0c5gBNwqVHT5fvHFF1aRmzVrphSi1cLmBOOjGPd89dVXbWxF0MpFVy9q/eXLl5fGjRurFijGRTdv3qxqYmh1wuAeanXOxiPsAuWFWwLoGnLWc+DWE2+SAAmQAAn4RcClQu3Zs6fgcGamTZtmtV6wYIE6x+wzdJ2hVjZ16lTrfa271nFG74svvqhmBdt2u6ArAUoX46s0vhPAZC5MZHjkkUd8D4Q+SYAESIAEvCJQ0CvX+Th217dsO96DgXWMUdkqU0x0wjgDZsZpXcb5RMfbJEACJEACJGAYAi5bqIGUEJ/WOBqMo86bN8/RmtckQAIkQAIkYAoCurZQTZFiCkkCJEACJEACASBAhRoAqKEOsmHDhlKpUqVQi8H4SYAESCCiCISkyzeiCIcgsQ888IDd+HQIRGCUJEACJBBxBKhQIy7LmWASuEHgzKUseWBdDa9wXM3MkULROXIqo7Brv5bFXJSxrCiWn7mUkS33VmBHWX6ceN8cBKhQzZFPlJIEdCVw1113ycxZH+gaphbY1atX1dJ+WKbUE1OmTBlPnNENCRieABWq4bOIApKA/gSw+k6rVq30D9gSIpbmxDfl2MmHhgQiiQD7WsIwt7HYxvbt28MwZUwSCZAACRiXABWqcfPGZ8mwZRRaCTQkQAIkQALBI0CFGjzWjIkESIAESCCMCVChhnHmMmkkQAIkQALBI8BJScFjHbSYsA+g7drJQYuYEZFAPgRGDh8up0+ezMdVYG9nZFyzTJrKVs9IMNYNL2aZnPW2ZcMKmvAnQIUahnn8wgsvcGGHMMzXcEjSDxs3SsKxk1I2KydkydlcNFayLN/I1sq4LpUDLEdqVEH5JeHGRuEhSzAjDhoBKtSgoWZEJEACIFDrWpbclpkdMhjfx0GhilS/ni31M7ICKsfx6IJyIKAxMHAjEeAYqpFyg7KQAAmQAAmYlgAVqmmzjoKTAAmQAAkYiQAVqpFyQydZtmzZIsePH9cpNAZDAiRAAiTgCQEqVE8omczNt99+K7///rvJpKa4JEACJGBuAlSo5s4/Sk8CJEACJGAQAlSoBskIikECJEACJGBuAn4p1NGjR8vKlSutBPbv3y/vvPOO9drxZNasWQI3NCRAAiRAAiQQbgT8UqjJyckye/ZsOXXqlOJy/fp1SU1NtTLCdWZmpvW6a9euUqOG+w2Ns7IC+12YVZgwPunRo4c0aNAgjFPof9J69eoltWvXdlsB9D8WhkACJBBqAklJSdK6dWupVauW/PbbbwEVx++FHXr37i2TJk2yezHl5ubKa6+9JteuXZOzZ89Kw4YNBav3zJw5Ux566CGZNm2afPzxxxIdHS1TpkyRBx54QKB8P//8c7WP4m233SZ44WnmzTfflE8++URdYmPk06dPS0xMjHY7JL9XrlwJSbyeRFq6dGnFEQWJJi+BX375RW1vh3KKCuFTTz2V15HF5vLly07t/bXs0KGDGLn8+Js+d/6jLPukRprJtLwH69atG2nJzpNeNKbef//9PPaBstDef0OGDBHt/OWXX5Z3333XryjdPbt+K9RmzZrJrl27ZMWKFQJFCIOtwxo1aiSPPvqoXLhwQfr06aMUanZ2thSwLPmF1tNPP/2kFO2ePXsECR40aJBSzHFxcTJu3Dg5c+aMlC9fXoXXpUsXpYhxsWTJEoHCCKVCBdCiRYsq2Yz4Ly0tTa1TWrhwYSOKJxkZGSr/grGOqjMAKJtQpljzuEKFCqo82bq7dOmSQDaUxUAYDH3gWfDVaL04qJAa0SB/wbdIkSJ5xHuxXz+R85G1tWBMTKz8c+6cPCxcWaBXDw0MI79jkMfevl9QHvDuDrQBP7yjS5UqpaJCo2/r1q0SHx8vnTp18lsGd+nW5YkcOHCg9O3bV9DVCIMXEcZK161bp4THw2VroGixCTYypUWLFqolcOjQIdWqhTu8bI4cOWJVqHjp4YBZtWqVehnHxsaq61D80xQCKgdGNJALL9tQMnLHBS8LVIhCpRDKli0r+FZ327Zt0rhx4zyVs4IFCyqFGih+9erVc4cn33sof8hjo26AgAp1jqUlWtKyKLyjCVWeO8oRzOsCBW80IjyNE8oAeRwM5eOpTLbukLfovUGF1IgG8uH50J7ftm3bypdffqmUrB49Be4aAroo1GLFismAAQNk4sSJqtX5/fffq+5edO2eP39eevbsace9Zs2aqisYiRw8eLDA/y233CKvvPKKUsarV6+WKlWq2PnhhecE0CuAAhWoFpbnkhjXJZQReldoSIAEwp9AfnN39CKgi0KFME2bNpV7771XdVWgFrBw4UKlYNHahMJMT0+3k7lNmzayYcMGqVixorLv3r27jBkzRnUjoBbbrl07O/e88JzAhx9+KOD7yCOPeO6JLkmABEiABPwi4JdCdRxgHjFihFWYDz74QDWxbccBhg0bZr3fsWNHwaGZ5s2bCw5MZDJqV5YmK39JgARIgARIwJGAX5/NOAbmeG2rTB3vubqmMnVFhvYkQAIkQAJGJhBQhWrkhFM2EiABEiABEtCTABWqnjQNEhYm2yQmJhpEGopBAiRAApFBwK8x1MhAZL5U4lMkzvA1X75RYhIgAXMToEI1d/5RehIwHYGUqIJyKtr+2/RgJkJbqynV8n3oqejAdtKdD3D4weTGuPInQIWaPyO6IAES0IlAXHwx2VQqXjbpFJ4vweDDf7z4tpYoKj9bvtcOtClh4FXVAp32SAufCjXScpzpJYEQEli15ssQxn4jaqzUhYPDIiHPirATILD9HWGHyxwJwsYDWCuZhgRIgARIIHgEqFCDxzpoMWG5x6tXrwYtPkZEAiRAAiQgQoXKUkACJEACJEACOhCgQtUBIoMgARIgARIgAdNNSipXrpyMHj1a7aYSquzDfpRG3obq999/l9TUVLX5QKgYuYsXGyZgizTsiGNEg/yFbO62aQql3JilCgOGRjTIX2zZaNRnBLLhMCo/5C8YhnLP5/zKFeQz8vMRSH6nT592+e4qYClYofsgLL9c430SIAESIAESMAkBY1ZxTQKPYpIACZAACZCARoAKVSPBXxIgARIgARLwgwAVqh/w6JUESIAESIAENAJUqBoJ/pIACZAACZCAHwRMN8s3JSVFLly44EeS6ZUESIAESIAEfCdQo0YNp55Np1CnT58uxYoVM+yUd6eUaUkCJEACJBAWBL7//ntZvHix08+GTKdQkSOtW7c27DduYVFimAgSIAESIAGnBI4dO+bUHpYcQ3WJhjdIgARIgARIwHMCVKies6JLEiABEiABEnBJgArVJRreIAESIAESIAHPCVChes6KLkmABEiABEjAJQEqVJdoeIMEwovAiRMnpEuXLvLLL7/kSVhSUpJMnTpV/vGPf8iOHTvU/fT0dPnXv/4lAwYMkDVr1lj97Ny5U4YNGyZTpkyRU6dOWe15QgKRToAKNdJLANNvKgLXrl3LIy921sjMzLQ7YGdrtm7dqpTgmTNn5Pr167a31Pm0adPk0qVLUq9ePRk1apRcuXJFli9fLmvXrpXOnTvLW2+9pRQxlCx2e6pTp47axB5KmIYESOAGASpUlgQSMDiBmTNnysCBA6V3797Svn17mTVrlp3EGzZskHbt2tkd//73v+3cfPfdd/Lss8/a2WkX2HAKrc777rtP/vznPwuU5sGDB1VLtW7dusq+UqVKSqEeOnRIKdsHH3xQWrZsKbt27VJbjWlh8ZcEIpmAKb9DjeQMY9ojjwD2xzx58qTMmTNHVq5cKcuWLZPnn3/eCqJJkyby0UcfWa9xkpCQYHc9ePBgcda6hSO0TNGixYIp8fHxyh/208WhrQgD+7S0NGUHB3BbtGhRta/oxYsXpVSpUsof/5FAJBOgQo3k3GfaTUOgcuXKUrx4calQoUIexYjuXIxn2hq0Rjt06GBr5fI8Li5O3cvIyFDduLiAAoXCRGsV5urVq1Y7XMOtdg/uaEiABESoUFkKSMAEBGJiYpSUBQvmHaXBuOf48ePtUoEu2vwMum/Rar3zzjulatWqsn//fqVEEcett94q1atXV3bJycly9uxZ1VpNTExUy37C7YEDB5S/2NjY/KLifRKICAJUqBGRzUxkOBNAd6svXa6rVq0STFKaOHGiDBo0SN5//335z3/+o7qTy5QpI08//bTMmDFDunXrJm3atJEWLVqo9Usx6xeTlNCK7d+/fzijZdpIwCsCBSwTEnK98hFix2PGjJHHHnuMa/mGOB8YvfkJoIX69ddfS79+/ayJwQxgrTWsWWIGsWMrFO6io6OlQIECmjP+kkBEEJg7d676xCwqKipPetlCzYOEFiQQGQQwLtqrVy+7xDoqU9x0VKawc+YO9jQkEMkEqFAjOfeZ9ogmgE9iaEiABPQjkHeGg35hMyQSIAESIAESiBgCpmyhbtmyhRuMR0wRZUJJgARIwDgETp8+7VIY0ylUfIeHVV1CORkCH9o7+3zBJeUg38BH+pAvlIzcJVmbB2dU+ZC/MEbNY/JzV7ryv2d0fpAPZdDZpJf8UxccF0Z+B4If3oGYNBcIU7hwYZfvhsDEGIhU/BHmhQsX5O2333Y6USKA0doFjZVhsFKMURXC+fPnBR/rax/s2wlvgAusE1uoUKGAFXh/k4gyhocReWxEg0UVUPbA0IgGzwdeuCVLljSieGotY8xSNvLzgTwuXbq0Ifkhby9fvqwWGjGigGCHMliuXLmAiDdhwgSXFR6OoQYEOQMlARIgARKINAJUqJGW40wvCZAACZBAQAhQoQYEa2gDXbRokdM9L0MrFWMnARIggfAmQIUahvl77NgxtTNIGCaNSSIBEiABwxIw3aQkw5I0iGDbtm1TC5r/vP0XeX38RKdS5eRkS9b1LHUv1s3EluLF4uWrNV86DYOWJEACJEAC9gSoUO15mP4Ku4dkZ+dIVuk75FqU/Z6YWuKyUo9Lxm//U5dFG3S2zBjN21GRc+W8XD5yw43mj78kQAIkQAKuCVChumZj2jvZ+IateCWJjaviPA2WFqpmYsv+yalCzYopIjddaa75SwIkQAIk4IpA3qaJK5e0Nw2BU6fPSborZWqaVFBQEiABEjAXASpUc+UXpSUBEiABEjAoASpUg2YMxSIBEiABEjAXASpUc+UXpSUBEiABEjAoASpUg2aMP2LFF42T6OsX/QmCfkmABEiABLwk4PUs388//1yWLl0qMTEx1qjGjRsnlStXtl77e7Jq1Spp3769v8FErP9SJYtLRmaKZMUUj1gGTDgJkAAJBJuA1woVuwxA2XXu3NmprFlZWXl2EcHODpoCdra1WHp6uto5Q9sua/HixVSoTumGt+WOHTukVq1agu2RnJm9e/dKxYoVDbuLiTOZaUcCJBA5BLxWqK7QbNy4UZYsWSJFihSRmjVrSp8+feSrr76S1atXS3JyskycOFF+/PFHtZcpFGy7du2kVatWgtbt1atXBVuOdenSRW0LdO7cOZk3b55069ZNRZeWliaXLl1S51i4AEpbU76u5AmkPbYvggx6bN925swZFZZe8p49e1avoAT7Ch49etSn8EqVKuVyeyzwQ8XK1owaNUrWrl0rqFxt2LAhj9KcO3euzJo1S5WDNWvWSNWqVW2963qu7UeJPDaiATuUPaPKh/zVnhGj8jOyfJANZdCo+WuG5yOQ/JA/roxPChUtyK+//lqF2ahRI+nXr5/A7s0331QtzREjRgjWk0XE2JNuxowZ6kW4efNmmTZtmrIfPHiwNG/eXHbt2iVTp05Ve08ePnxYKVks7q4pU0Qyc+ZMmTNnjoqvYcOGSvlqLV5lGYJ/ePHrYZDOkydP6hGUNYyaNf9kPffnBA/0Qw895FMQI0eOlAcffNBjv+jm1/aohGJFZcvWzJ49W5UhVKRQPnr37m17OyDnqOjR+E4AFWMjG62SblQZjc5Pr3dgoPgHip+7dPukUNHda9vlm5KSompU2obHderUka1bt6quu8TERMVr+/btkpSUJMOGDVPX2MA5NTVVKePJkyerxdx79OjhlO2QIUPkxRdfVPegfMuXLx82G4yjteWuxuMUiBtL9AIMeXmEFKpW0Y0rz26h0vLjtq2eOXZwBb9RUVEOtjcunW0w3rdvX3n33XcFLdsOHTpYhwi0AF599VUZOHCguv/CCy+oX+2e3r8ol5CdG4z7RhaKCq1objDuGz9U5PDS5gbjvvFDLyY2GC9btqxvAeTjy93G9D4pVMf4EhISBInIzMxUim737t3y+OOPq65e7aUKJVumTBmZNGmSUiCffPKJas2eOnVKtWChbF966SVp27Ztnq5UKF8cMAgP3V16dLc6psPTay1+PWTQKiGexp2fu9jYWMnEmHVUofycenQfXfh6G2f8BgwYoMoMxkiRBkfz8MMPqy5hKNz4+HjH27pfazLqHrAOAWqy6VH+dBDHaRCajE5vhthSk438fMsIM/BDygKVv+7C1UWhQviuXbsKunpRM0ULsnHjxmoMFfdgoHRhN3z4cKVQ69evr16MGEPE+BlqtX/5y1+U2xIlSqhuYLRMaSKHgNab4SrFVapUcXWL9iRAAiQQcgJeK1RMHHJmWrduLTjQUtVaXZh4ZGu6d+9uHWjXWpyDBg1SLVtofW1cFF1/aO3SkAAJkAAJkIBZCHitUPNLmKZMXbnTFKntfWddfM7sbP3w3DUB1S2ekyW5BXXPXteR8g4JkAAJRDgBrpQUhgWgUoWyUiT9RBimjEkiARIgAeMSoEI1bt5QMhIgARIgARMRoEI1UWZRVBIgARIgAeMSoEI1bt5QMhIgARIgARMR4KwVE2WWp6KmWpZqzC50RjIvpDr1knUxyWp/7cQOp99rZaenWN3whARIgARIIH8CVKj5MzKVCyx6ULJEScm9dsSy3nEBp7Jnx2bL9cRb1b3CWQeduhFLyShuWYyDhgRIgARIwDMCVKiecTKNq7p168q/5s5WC9O7WyLLNAmioCRAAiRgEgIcQzVJRlFMEiABEiABYxOgQjV2/lA6EiABEiABkxCgQjVJRnkjJra627Ztmzde6JYESIAESMBPAlSofgI0ondsMn758mUjikaZSIAESCBsCXBSUthmLRNmZgLYhQmHM4MNKLCZRDDWu65Ro4YULVrUmRi0IwEScCBAheoAhJckYAQCS5Yskffff09io73vRMrKzpGcXBF8NRUd5b1/Lf0ZmdmyYMECadSokWbFXxIgATcEqFDdwDHrrdKlS6vPZswqP+W+QaBhdZG/tb7gNY53vykiO47FSJOamfJs6wyv/Wse/r4gQTvlLwmQgAcEqFA9gGQ2J8899xwVqtkyjfKSAAmYnoDv/UGmTzoTQAIkQAIkQAL6EaBC1Y8lQyIBEiABEohgAlSoEZz5TDoJkAAJkIB+BKhQ9WNpmJA2btwoR44cMYw8FIQESIAEIoEAFWoY5vKmTZvk6NGjYZgyJokESIAEjEvAo1m+Y8eOld9//92yHdhN/Tty5EipWbOmcVNGyUiABEiABEggiAQ8UqgpKSkyZswYqVatmlPRsrKylH109M3gsrOzlQLGii6agTsoZU0x49rWj+aOvyRAAiRAAiRgNgI3NaAPkn/zzTeCIycnRy2T1r9/f2natKlglZedO3fK9evXpV27dtKqVSvp27evxMTEKKX8xBNPyPjx46VKlSoCpVq/fn0pVKiQpKamSvfu3SUtLU1Gjx4t06dPV1L9+OOPKjxcYJ3aK1euSGZmpg8S6+MFcWOtXNvKgj4h6xcK2Bt1PV/w0ypc+qVYv5BQJlGmly1b5nL5P/1icx7Sli1bLDcsyx2F0OTm5sqKFSsEz583BvzgF897qAyWTGzevLnT6FH2kL84jGi058Oozy/yVnsHGpGf9vwGih/era6MxwoVCk5bOxQPygcffGAtkNOmTZMdO3bIZ599JnXq1JHNmzcL7FBgBw8erBRqcnKyvPPOO1K5cmUZNGiQDBs2TGrVqiUTJkxQL9f7779fBgwYoBTqunXrBNeaOX78uGzdulW7VJmJTA2VQbrcQQ2VXFq8vXr1kvj4+JBWOjRZnP3ihYb8M2qFBPkL+fbu3SuHDx92loSA2yUlJUn52IBH4zaCXItC379/v0AWbwzY4dB6orzxq6fbJk2aOA1Oy1/IaESjKXwoLSMacANDo8qnvV8CJR/Cd2U8Vqivv/660y7fu+66S4VdvHhxBXj79u3qAYTChEGXLpQplDCUKQwW/UYNEub2228XLPZdrFgxSUxMlH379sn69etl4sSJ6j7+Pfnkk+rAOexLlSplVe6wC7a5ePGiktfICiEuLs6wqyWhhwE9Ekbt7r9w4YKSDZXIUJkZM2bIj1+9F6roVbwFCxRUFV9v1/LF84EXbsmSJUMqv6vIURnGgWfEiAbPR0ZGhiQkGHPpR+QtWn945xvRgB3KYKD4FS5c2GWyb84ycunE/Q3HWihaqGXKlJFJkyap1ieuS5QoYVdbrVevnuzevVsFjJatZtA9vGjRIgUCCpaGBEiABEiABMxCwOMW6qhRo+xahehWdGZQK2jcuLEMHz5c1VIxPurYEunWrZtgE+ylS5eq1qnWlQx/b7zxhgwdOtRZ0LQjARIgARIgAcMS8EihYuwzP4MZwJhoBIOJRRgYhtGUKbaB0szBgwfVeCm6hN5++21rVzC6EsqXLy+uxj40//x1TwBd6uglMGqXlnvpeZcESIAEzEnA7y5fV8mGItWUqaMbjIFiMhJaohg4btiwoVqIAK3ejh07SlRUlKMXXntBYO7cufLzzz974YNOSYAESIAE/CXgUQvV30gc/d99992Cw9ZgQtK8efNsrXhOAiRAAiRAAqYhELAWqmkIUFASIAESIAES0IEAFaoOEBkECZAACZAACVChhmEZaN26tVSvXj0MU8YkkQAJkIBxCYRkDNW4OMJDsnvuuYczfMMgKw8kFZQZa73/uP9ESrbEROfKobOFLP59X7wg/ZrrFWHCAC+TQAK6E6BC1R0pAyQB/wlgHdqiRYs6DQir/GCVLlez6J168sHyEYsfrLdNQwIk4BkBKlTPONEVCQSVABZEweHMYGk1KFQs30hDAiRgHAIcQzVOXlASEiABEiABExOgQjVx5rkSfebMmWrHH1f3aU8CJEACJKA/ASpU/ZmGPETstIAdfGhIgARIgASCR4AKNXisGRMJkAAJkEAYE+CkpDDOXCaNBDwhkJqaKrNmzfLEqUdusD43NqH2dtJUmzZtuDGGR4TpyKgEqFCNmjN+yIWN3I26+a8fyaLXABG4dOmS2k7x8cR0ifaxz+rwpSjZkRwjhSz+/1wlQ0maUcBzgTedLSLlypWjQvUcGV0akAAVqgEzxV+RunbtyoUd/IUYgf7H3n1OCvm40dPi3+Nl+/kEi/9sGd/gnNf0+m6p6rUfeiABoxHwsT5qtGRQHhIgARIgARIILQEq1NDyZ+wkQAIkQAJhQoAKNUwykskgARIgARIILQEq1NDyD0jsa9eulUOHDgUkbAZKAiRAAiTgnAAVqnMuprbdtm2bnDx50tRpoPAkQAIkYDYCVKhmyzHKSwIkQAIkYEgCLj+bWbZsmXz22WcSExNjFbxjx47Svn1767XtyaZNm+SOO+6QUqVK2VrznARIgARIgAQigoBLhXr58mXp0KGDOlyRwHqx2mooK1askOrVq1udYs9GW2WclZWVZ/9GW/9WjzwhARIgARMTwEIZL7zwguzZs0cwnyEhwftN4k2c/IgW3aVCdUXlzJkz8sorr6iFA65cuaJWNmnatKmaBDNjxgwZOHCgup+eni6dO3eWEiVKyJIlS6RIkSJSs2ZN6dOnj0yePFkQDhQuFPfEiRPl22+/FSyB1r17d0lLS5PRo0fL9OnTlRhz586VlStXqnO0gJOTk+2UtStZA2WfnZ2tFp/HnpRGNHiYUdE5f/68EcUT8Lt69ara09OIAqLyh+XzArXBAMo8nhOjGKQ11CYnJ0dmz56tesVCIctzzz0nzZo10yVqPH87d+5UYb300ksyZcoUr8LF84GlG436/EI25JcRyo0zsJANDAPFD7rNlXGrUOfPny+rVq2y+h05cqTEx8fL0aNHrfbPPPOMoDBCWQ4YMEAVhJSUFPn0008lKipK+vfvL2+++aZ6wY8YMUKOHTumEtukSRN5+umnZfny5cotzuEfCnXdunVy//33W+Nt1KiRlCxZUl2jazkuLi6kChVAUUEwqkGBio2NVYcRZYSiQmWqYEFjDuFD2UO2woULBwQf0o7VrHw1eFnA4PnSw1y4cEGmTZumR1A+h4HKaYMGDaR58+Y+h+GpRzwfOKKjb77+ateurdvqYhgW27t3r8qfWrVqeR0ung/08OE9Z0QDhYpN7o36DgQ7vKMDxc+23Djmz80S5XjHco2HHt2+tgYtSxQ+LVDbbl3NXZUqVVRhgmK1XSS7Tp06snXrVuUM5zAocBivLVasmCQmJsq+fftk/fr1qtWqHFj+wa3mHgUVGQmFESqDFgxkMGoLFQoBfAJVoPzlrpUJrQz5G57e/vFCg2yB5PfUU0/5LDZeZih72nCLzwH94fH48eOGUKh33323+MPFUw544QZSYfXo0UNKly6t8ujRRx/1VCyrO60FGMjyZ43MhxOtBWhU+fB84BkOlHzOdJ6G0acmgrOWBWrLKAgwWs0ZYwdImNY1sHv3bsHC7TAHDhxQvxhngCKFadeunSxatEiNOUDB0pAACZCAGQmgleqLMjVjWinzTQJuW6jo8v3iiy+srjHG8Pjjj1uvbU/Q5Ytxz1dffdXWWrVy0dWLbqry5ctL48aNVQt09erVsnnzZtV1gDFUGNx74403ZOjQoXZh8MI7AuiSr1ixYsBqaN5JQ9ckQAIkEBkEXCrUnj17Cg5nxna8ZcGCBcoJJhuhqwNdjVOnTrV6a926teBAS9W2i+rFF19Us4Jtm+XoSoDSxfgqje8EFi9eLNhbslKlSr4HQp8kQAIkQAJeEfCpy9dVDO7GNW2VadGiRfOMUaFV1atXL8G3rlqXsat4aE8CJEACJEACRiPgsoUaSEGdfTKAcdR58+YFMlqGTQIkQAIkQAIBI6BrCzVgUjJgEiABEiABEjA4gZC0UA3OxPTiPfzww1KtWjXTp4MJIAESIAEzEaBCNVNueSgrvueznezloTc6i3ACV7MKStYfn755iyIz54YPfDh3Jcv7FcSy/vDvbbx0TwJGIkCFaqTcoCwkEEIC962+xe/Y0zKjpPHKKj6F09InX/REAsYhQIVqnLygJCQQEgL4vOq///2vbnFjcXgs8lK8eHGvwuRiLl7homMDEqBCNWCmUCQSCCYBfKaGhUD0MvgsDt+Ua+tv6xUuwyEBoxPgLF+j55AP8r311luyceNGH3zSCwmQAAmQgK8EqFB9JWdgf1g7WduRxMBiUjQSIAESCCsCVKhhlZ1MDAmQAAmQQKgIUKGGijzjJQESIAESCCsCnJQUVtl5IzHVq1dXW+CFYdKYpAgn0N2yR/PvBw/6RUFtMmmZhexqP2MMl2RZJlXha9pYy2bwepmOnTvL3//+d72CYzgGJECFasBM8VekTp06cWEHfyHSvyEJnDl5Uv508qxUvZ4dMPn2FIqWnUViJD47R9peuqZLPFst4aWmpuoSFgMxLgEqVOPmDSUjARJwQqC8RdFVD6BCPRN9YyQML0e94jlYKMpJSmgVbgQ4hhpuOcr0kAAJkAAJhIQAFWpIsDNSEiABEiCBcCNAhRpuOWpJz+rVq2Xfvn1hmDImiQRIgASMS4BjqMbNG58l+/XXX6VcuXI++6dHEiABEiAB7wmwheo9M/ogARIgARIggTwE/FKoo0ePlpUrV1oD3b9/v7zzzjvWa8eTWbNmCdzQkAAJkAAJkEC4EfBLoSYnJ8vs2bPl1KlTisv169ftvrXCNdaV1UxXy0fZNWrU0C6d/mZlZTm1pyUJkAAJkAAJeEoAQ18pKSmeOtfFnd9jqL1795ZJkybZtUyxF+Jrr70m165dk7Nnz0rDhg3lhRdekJkzZ8pDDz0k06ZNk48//liio6NlypQp8sADDwiU7+eff662fbrtttukV69e1gTig2jssQiDMKF0Cxb0qy5gDduXE2xNBRlcrbTiS5h6+nnppZekSJEiSkY9w9UrLPAz8uL9KL9aHuuVZj3DATuUPV8rnydOnFD7leopk21YV69eVfwuXLhga63LuZHLTX4JxDvs8OHD+TmTjIwM1RC5ePFivm5D4QDPBmSMi4tzGn1CQoJgC79QGZSRhQsXyvz585Xe+PLLLyUxMVE3cZB+V8ZvhdqsWTPZtWuXrFixQqAIYVAQGjVqJI8++qjgoerTp49SqNqLoEGDBvLTTz8pRbtnzx4ZMmSIDBo0SClmZNK4cePkzJkzUr58eRUeuornzJmjzqGcz58/LzE6LgmmAvbyX3p6upc+guscLzUcNL4TCFd+7du3VxVY38mEzmdciJ97f1K+etUqNQPfnzDM4BcV+sceeyykoi5dulQpU1Q8Fy9eLGj46WXcvfv9VqgQcuDAgdK3b1/p0aOHkhlKEWOl69atk9KlS+epDUPRLliwQNVyWrRoIZcvX5ZDhw6pVi0CgOI9cuSIVaEOHTpUBg8erMKePHmyso+NjVXXofiHCkOxYsUM20JFVzxaqK5qkKFgZhvnlStXpFChQqqHwtbeKOfoEcGm28hjIxq0DvCiAENfzLZt23zx5rEftMTwDAdig/HHHv6zSPKN3iqPBTKIw6eeflpGjRqVrzSoyOGljXenEQ1aaHhnFy9e3Kl46HkMZQ8iejGxZvLIkSOlTJkyqjFXqlQpp7L6YunuvaqLQsWLZ8CAATJx4kTV6vz+++9V1yy6dtGa7Nmzp53cNWvWVF3BaIpDUcL/LbfcIq+88opSAviOskqVKlY/eLnhgMEvXiY4QmW0+EMpQ35p12TMz10o7muykZ9v9P3l56si9lRavNDw0g1EPCF87D1Nvkt3UDKeMEFXfqD4uRTOixuQDUN0nqTFi2B1ddqyZUvVoEOlLj4+Xtew3b23dFGokLZp06Zy7733KtB169ZVfdhQsKipQmE6NpPbtGkjGzZskIoVK6rEdu/eXcaMGSOFCxdWLZd27drpCiGSAjtw4ICqoFStWjWSks20kgAJkICVABppwTZ+KdT333/fTt4RI0ZYrz/44ANB157t4PSwYcOs9zt27Cg4NNO8eXPBgdqtkWs+mrxG/sV4NiosVKhGziXKRgIkEG4EAjpV1laZegqOytRTUnRHAiRAAiRgJAIBVahGSihlIQESIAESIIFAEqBCDSRdhk0CJEACJBAxBPwaQ40YSiZL6BNPPGE3S9pk4lNcEiABEjAlASpUU2abe6Fr165t2G9Q3UvOuyRAAiRgXgJUqObNO0pOAhFJ4GhMlGQG8DP0pJgbI2GIY0dhfV6R56MKyp8iMrciK9H6lJbIYsbUkgAJhIjAHZZv3I9a1ok94kf8WKvZ8mdZzce5Vs61LKxQ/Y+1uo/4uBqVo3hYWoCfsTlSCb9rKtTwy9M8Sz2GYRKZpAgl8Jab7SE9RYJVfnC4W0LO07DojgRsCXCWry2NMDnHesdYhYqGBEiABEggeASoUIPHmjGRAAmQAAmEMQHqefgRAAAK7UlEQVQq1DDOXCaNBEiABEggeASoUIPHmjGRAAmQAAmEMYEClhlvlvlu5jErV65Um5OHUmJsXxTK/f7yS/vevXvVXorlypXLz2lI7hud39mzZ9UG9nruoagnaO2RdbeNlJ7xeRtWSkqK2mWqbNmy3noNmnsjl8G0tDTBnqjaTlxBg+JFREbmB3bYNjRQs6oxoQ07qTl7/kynUL3I84h1+rRlI+Mnn3xSOnXqFLEM/Ek4Nie+9dZbZdCgQf4EE7F+p06dqvY7xuQ4Gu8JLFy4ULBX9Pz58733TB9qQubYsWNl/fr1QafBLt+gI2eEJEACJEAC4UiA36GGYa5it3q0sGh8I9CoUSMxcnelb6kKnq877riDa0n7gbtatWrSokULP0KIbK/ly5eXhx56KCQQ2OUbEuyMlARIgARIINwIsMs33HKU6SEBEiABEggJAXb5hgS7fpEuWbJENm7cqGb1Dh06NM9yavnd108Sc4a0ZcsWAaMsy9qtmIyUmJhol5B58+YpvrAsXbq0TJgwwe4+L0SSkpLkHcuSgJMmTcqDIz++eTxEoIU7fj/++KPMnj3bSmX8+PFSpkwZ63Wkn+zbt08+/fRTSU9PV93kjz76qB2SU6dOyXvvvScXL15UEzVbtWpld1/3C3w2Q2NOArt27codNWpUrmUad+6yZctyP/jgA7uE5HffznEEXly5ciX32WefzbU8bLkHDx7M/b//+788FF544YXc1NTU3GvXruVmZmbmuR/pFj/88INi2K1btzwoPOGbx1OEWbjjBxSzZs3K/e6771T5QxmksSeA5/P06dOW/QyycgcMGKDObV289NJLufv371fPcK9evdSzbntf73N2+epeRQlegDt37hRMQIqOjpYHH3xQfv75Z7vI87tv5zgCL44ePSq33XabFCtWTGrWrCkWBaAWTddQ4Fs71GwtLz1Zu3at4JrGngBaBq4+j8mPr31IkXnljh+IWCp6cunSJVmxYoVcvnw5MiG5SfWrr74qmIQUFRWlvgtNTk62c43vUfGMlyhRQupadirCN/qBNFSogaQb4LDPnTunlAGiiY+PVy9/2yjzu2/rNhLPwad48eLWpIMhPqrXDBYoKFmypDosrVRBlzqNPYH777/fjqHt3fz42rqN1HN3/MAEC8hYWlGSkJAglh4UteBDpLJylm4oU5hFixapdyFmmGsGFZFCNtvvoeJs+3xr7vT85RiqnjSDHFZRy76QqOHCZGRkqBe/rQj53bd1G4nn4INVVTRj6VJTNVntGmNV7777rrq899571YfiqPFyDEsj5P43P77uffMuCNi2/i1dl7Jp0ybVG0U6NwlgjPnIkSOC1qqtKVKkiHovanZ4VwZ69TO2UDXaJvxFV8aePXuU5Lt375YaNWrYpSK/+3aOI/AC3/sdOnRItQDQnYaWQExMjJUEJjSMGzdOXWO5sWA8kNbIw+AkP75hkMSAJgFDDEOGDLEqhePHj+d5xgMqgAkChzJF79GYMWPsnl2IjqEwtFDRKsWzjQqJ46RDvZPIFqreRIMY3n333afWNf7HP/4h6J7UZlk+88wz8v7774ur+0EU0dBRoRsNY88vv/yyXLhwQZ5//nklL1oFaJFifBpdwpaJX3LixAnp0qWLGqsxdKIMIJwtP2d8DSCioUX46quv5MCBAzJw4EB54IEHVPlD7wnWpq1evbqhZQ+mcOgt+uSTT9QiNpbJhSpqdItjHFXjZ5m0JK+99ppYJhSqZzrQC7ZwYYdgloAAxYWHzXaswDGa/O47uo+0a7Q+ManB1YYH4If7qPHSeE8gP77ehxhZPtBSRRlEFyaNbwSC9Q6kQvUtf+iLBEiABEiABOwIcAzVDgcvSIAESIAESMA3AlSovnGjLxIgARIgARKwI0CFaoeDFyRAAiRAAiTgGwEqVN+40RcJuCSAT3AKFCjg9MDao+4MPtPBjEQYzOjcsWOHO+ce37Msz6Zmfnvs4Q+HluXcZOLEiS69YR1ppBWzLTWDD+pdpR9rqfrDR4uDvyRgRAJUqEbMFcoUFgTwHSsW3bc9ateu7TJt2dnZMnr0aOsSh6tWrVLLprn04MWNb7/9VtasWeOFD8+cQpHiU4V//vOfVg9YkUZLMxQuPlXQriGHZrzlo/njLwkYlQAVqlFzhnKZngA+s8HnNrYHEgXFie/msKzhrZaN4KdMmaLS+te//lX93n333YJv7AYNGiTHjh0TyyYH0rNnT+nfv79apemRRx6Rw4cPS+vWrdVG3m+//bbyh39QcFh+DcsoNmzYULZu3SpQXFgg4L///a9YFrFXbi0LrgvigQwdO3ZU3+5pgVgWFJeKFSuq73BPnjypWef5xepcX3zxhWrBIg58+6cZxzRr17afJrnio4XBXxIwGwEqVLPlGOU1DYG5c+fKzJkzrQe2mYJZvny5WrUFC5+jFYoPz7FiE9zCrFu3Tm0V99tvv6lVcqC4sI1cpUqVBNuhQXndc889Mnz4cLVo+uuvv66+U4R7tBb/9a9/qaXYoDCxKEWFChXUsmzNmjVTSylCWT/22GPy4osvyq+//qq2/NMWBYEMaEViM4C//e1vSj4llJN/UKaQA4tfPPXUU3atVCfO81i54pPHIS1IwCQE+KW6STKKYpqPALpYY2NjrYJjpZunn35ajS9iTPOXX34RLI6Oc6x7i5YrDPZdxRikrcHCHSNGjFBWWD0Hy6g9/PDD6hru0YrFjjnoYoUixTKJWgsVrUJ0w0IW7Lrx4Ycfyp133ilYUQsGY6QICy3lf//732LZ5krdhxvsJenKoDWstaqhUBEG9uu0Xb7RlV/Yu+Ljzg/vkYCRCVChGjl3KJupCaBF6mypsw4dOsj333+vNjyGouzdu7daM9hRidomHq1TzUD53n777dqlWiULY5Tovv36669V9zDWfcWkJk1JWx1bTrCt2rZt2/Is8o/uXbSaGzVqZHWOJRidmbNnz4q2RN4bb7yh1kqFHVqtSJ8nxhUfT/zSDQkYkQC7fI2YK5QprAlAcWI275kzZ2TGjBkyf/581U3rLtGOyx46U74LFy6Ujz76SHUdI2zsvoFFwR0Ndtxo27at2u4P+73iQDdy5cqV1WE7FgrF7MxguyysdYxWKlq8iNdxcpIzf7QjgXAmQIUazrnLtIWUAFqNaCHaHlBw2CEDXb+FCxdWv/Xr11djoJi4g25ZbHTui4FSxCbKTZs2VesOQ+lhHV2YuLg4a7hQpuvXr1etUdzD5tVNmjRRM3HxWQvGeLH2KVqcGzZsgJM8BooUE6UwhqodmET1zTffiCsl7BiIKz6O7nhNAmYhQIVqlpyinKYjgG5atCxtD7Qie/TooRbixyc0tWrVUkpPG8/EmCq2Pdu7d6/X6e3atatSZlBwGD/F9n1JSUlqPLVevXqyc+dOwcQkKPAJEyZIgwYN1HgrWstoYULOMWPGqHjhF/fh1tFgy0BsF/jEE0/Y3YIfxDtnzhw7e1cXrvi4ck97EjA6AS6Ob/QconxhSwCzd7GIA2bJ2hq0UDFO6qvB9lXo1rX9RAVhOe5agpYz9pLEpCZHgz0kIYNjV7OjO16TAAncJECFepMFz0iABEiABEjAZwLs8vUZHT2SAAmQAAmQwE0CVKg3WfCMBEiABEiABHwmQIXqMzp6JAESIAESIIGbBKhQb7LgGQmQAAmQAAn4TIAK1Wd09EgCJEACJEACNwlQod5kwTMSIAESIAES8JnA/wf0Rkob7pWDJwAAAABJRU5ErkJggg==" alt="plot of chunk sim-plot" />
+<div class="figcaption">plot of chunk sim-plot</div>
+</div>
+<p>All weighting methods improve over the naive estimator. At <span class="math inline">\(n = 500\)</span>, entropy balancing (which only
+targets linear covariate means) retains substantial bias, while energy
+balancing and forest balance both reduce bias more effectively. At <span class="math inline">\(n = 1{,}000\)</span>, all methods improve, but
+forest balance continues to show the lowest bias and competitive RMSE,
+reflecting the advantage of its confounding-targeted kernel.</p>
+</div>
+<div id="step-by-step-interface" class="section level2">
+<h2>Step-by-step interface</h2>
+<p>For more control, the pipeline can be run in stages:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="fu">library</span>(grf)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">simulate_data</span>(<span class="at">n =</span> <span class="dv">500</span>, <span class="at">p =</span> <span class="dv">10</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co"># 1. Fit the joint forest</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>forest <span class="ot">&lt;-</span> <span class="fu">multi_regression_forest</span>(dat<span class="sc">$</span>X, <span class="fu">scale</span>(<span class="fu">cbind</span>(dat<span class="sc">$</span>A, dat<span class="sc">$</span>Y)),</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a>                                  <span class="at">num.trees =</span> <span class="dv">500</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co"># 2. Extract leaf node matrix (n x B)</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a>leaf_mat <span class="ot">&lt;-</span> <span class="fu">get_leaf_node_matrix</span>(forest, dat<span class="sc">$</span>X)</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="fu">dim</span>(leaf_mat)</span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; [1] 500 500</span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co"># 3. Build sparse proximity kernel</span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a>K <span class="ot">&lt;-</span> <span class="fu">leaf_node_kernel</span>(leaf_mat)</span>
+<span id="cb9-16"><a href="#cb9-16" tabindex="-1"></a><span class="fu">c</span>(<span class="st">&quot;kernel % nonzero&quot;</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> <span class="fu">length</span>(K<span class="sc">@</span>x) <span class="sc">/</span> <span class="fu">prod</span>(<span class="fu">dim</span>(K)), <span class="dv">1</span>))</span>
+<span id="cb9-17"><a href="#cb9-17" tabindex="-1"></a><span class="co">#&gt; kernel % nonzero </span></span>
+<span id="cb9-18"><a href="#cb9-18" tabindex="-1"></a><span class="co">#&gt;             29.7</span></span>
+<span id="cb9-19"><a href="#cb9-19" tabindex="-1"></a></span>
+<span id="cb9-20"><a href="#cb9-20" tabindex="-1"></a><span class="co"># 4. Compute balancing weights</span></span>
+<span id="cb9-21"><a href="#cb9-21" tabindex="-1"></a>bal <span class="ot">&lt;-</span> <span class="fu">kernel_balance</span>(dat<span class="sc">$</span>A, K)</span>
+<span id="cb9-22"><a href="#cb9-22" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" tabindex="-1"></a><span class="co"># 5. Estimate ATE</span></span>
+<span id="cb9-24"><a href="#cb9-24" tabindex="-1"></a><span class="fu">weighted.mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>], bal<span class="sc">$</span>weights[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>]) <span class="sc">-</span></span>
+<span id="cb9-25"><a href="#cb9-25" tabindex="-1"></a>  <span class="fu">weighted.mean</span>(dat<span class="sc">$</span>Y[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>], bal<span class="sc">$</span>weights[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>])</span>
+<span id="cb9-26"><a href="#cb9-26" tabindex="-1"></a><span class="co">#&gt; [1] 0.2321743</span></span></code></pre></div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

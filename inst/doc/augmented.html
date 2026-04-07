@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Augmented (Doubly-Robust) Estimation</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Augmented (Doubly-Robust) Estimation</h1>
+
+
+
+<div id="overview" class="section level2">
+<h2>Overview</h2>
+<p>The default <code>forest_balance()</code> estimator uses kernel
+energy balancing weights alone. When the kernel captures all confounding
+structure, this produces an unbiased ATE estimate. In practice, however,
+residual confounding may remain — particularly when the confounding
+operates through complex nonlinear functions of the covariates.</p>
+<p>The <strong>augmented</strong> (doubly-robust) estimator combines the
+balancing weights with <strong>group-specific</strong> outcome
+regression models <span class="math inline">\(\hat\mu_1(X) = E[Y \mid X,
+A{=}1]\)</span> and <span class="math inline">\(\hat\mu_0(X) = E[Y \mid
+X, A{=}0]\)</span>. The ATE is estimated as:</p>
+<p><span class="math display">\[
+\hat\tau_{\mathrm{aug}} =
+  \frac{1}{n}\sum_{i=1}^n \bigl[\hat\mu_1(X_i) - \hat\mu_0(X_i)\bigr]
+  +
+  \frac{\sum_i w_i A_i \bigl(Y_i - \hat\mu_1(X_i)\bigr)}
+       {\sum_i w_i A_i}
+  -
+  \frac{\sum_i w_i (1 - A_i) \bigl(Y_i - \hat\mu_0(X_i)\bigr)}
+       {\sum_i w_i (1 - A_i)}.
+\]</span></p>
+<p>The first term is the outcome-model-based regression estimate of the
+ATE. The second and third terms are weighted bias corrections that use
+the balancing weights to account for errors in the outcome models.</p>
+<p>This has a key robustness property: the estimator is consistent if
+<strong>either</strong> the kernel (balancing weights) or the outcome
+models are correctly specified. When both are reasonable, the augmented
+estimator typically has lower bias and RMSE than either approach
+alone.</p>
+</div>
+<div id="basic-usage" class="section level2">
+<h2>Basic usage</h2>
+<p>Enable augmentation with <code>augmented = TRUE</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">simulate_data</span>(<span class="at">n =</span> <span class="dv">2000</span>, <span class="at">p =</span> <span class="dv">20</span>, <span class="at">ate =</span> <span class="dv">0</span>, <span class="at">dgp =</span> <span class="dv">2</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co"># Standard (weighting only)</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">forest_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, dat<span class="sc">$</span>Y, <span class="at">num.trees =</span> <span class="dv">500</span>)</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a><span class="co"># Augmented (doubly-robust)</span></span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>fit_aug <span class="ot">&lt;-</span> <span class="fu">forest_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, dat<span class="sc">$</span>Y, <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>                           <span class="at">augmented =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a></span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a><span class="fu">c</span>(<span class="st">&quot;Standard&quot;</span> <span class="ot">=</span> fit<span class="sc">$</span>ate, <span class="st">&quot;Augmented&quot;</span> <span class="ot">=</span> fit_aug<span class="sc">$</span>ate, <span class="st">&quot;Truth&quot;</span> <span class="ot">=</span> <span class="dv">0</span>)</span>
+<span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a><span class="co">#&gt;   Standard  Augmented      Truth </span></span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a><span class="co">#&gt; 0.01664814 0.06350369 0.00000000</span></span></code></pre></div>
+<p>The <code>print</code> method indicates when augmentation is
+active:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>fit_aug</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&gt; Forest Kernel Energy Balancing (cross-fitted)</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&gt;   n = 2,000  (n_treated = 1042, n_control = 958)</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&gt;   Trees: 500</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&gt;   Cross-fitting: 2 folds</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&gt;   Augmented: yes (doubly-robust)</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&gt;   Solver: direct</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&gt;   ATE estimate: 0.0635</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&gt;   Fold ATEs: 0.0898, 0.0372</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&gt;   ESS: treated = 795/1042 (76%)   control = 712/958 (74%)</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&gt; Use summary() for covariate balance details.</span></span></code></pre></div>
+</div>
+<div id="how-it-works-with-cross-fitting" class="section level2">
+<h2>How it works with cross-fitting</h2>
+<p>When both <code>cross.fitting = TRUE</code> (the default) and
+<code>augmented = TRUE</code>, the outcome model is cross-fitted
+<strong>in lockstep</strong> with the kernel:</p>
+<p>For each fold <span class="math inline">\(k\)</span>:</p>
+<ol style="list-style-type: decimal">
+<li>Train the joint forest (for the kernel) on folds <span class="math inline">\(-k\)</span>.</li>
+<li>Train two outcome regression forests on folds <span class="math inline">\(-k\)</span>: one on treated observations (<span class="math inline">\(\hat\mu_1\)</span>) and one on control
+observations (<span class="math inline">\(\hat\mu_0\)</span>).</li>
+<li>Predict leaf nodes, <span class="math inline">\(\hat\mu_1\)</span>,
+and <span class="math inline">\(\hat\mu_0\)</span> for fold <span class="math inline">\(k\)</span> out-of-sample.</li>
+<li>Compute the fold-level doubly-robust ATE using the cross-fitted
+weights and outcome predictions.</li>
+</ol>
+<p>This ensures that neither the kernel nor the outcome models overfit
+to the estimation sample. The user does not need to manage the
+cross-fitting of <span class="math inline">\(\hat\mu_1\)</span> and
+<span class="math inline">\(\hat\mu_0\)</span> separately — it is
+handled automatically.</p>
+</div>
+<div id="simulation-comparison" class="section level2">
+<h2>Simulation comparison</h2>
+<p>We compare four configurations using DGP 2, which has a rich outcome
+surface with moderate confounding (<span class="math inline">\(n =
+5{,}000\)</span>, <span class="math inline">\(p = 20\)</span>):</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>nreps <span class="ot">&lt;-</span> <span class="dv">5</span></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>n <span class="ot">&lt;-</span> <span class="dv">5000</span>; p <span class="ot">&lt;-</span> <span class="dv">20</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>methods <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;Standard&quot;</span>, <span class="st">&quot;CF only&quot;</span>, <span class="st">&quot;Aug only&quot;</span>, <span class="st">&quot;CF + Aug&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="cn">NA</span>, nreps, <span class="fu">length</span>(methods), <span class="at">dimnames =</span> <span class="fu">list</span>(<span class="cn">NULL</span>, methods))</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="cf">for</span> (r <span class="cf">in</span> <span class="fu">seq_len</span>(nreps)) {</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  dat <span class="ot">&lt;-</span> <span class="fu">simulate_data</span>(<span class="at">n =</span> n, <span class="at">p =</span> p, <span class="at">ate =</span> <span class="dv">0</span>, <span class="at">dgp =</span> <span class="dv">2</span>)</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  res[r, <span class="st">&quot;Standard&quot;</span>] <span class="ot">&lt;-</span> <span class="fu">forest_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, dat<span class="sc">$</span>Y, <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>                                        <span class="at">cross.fitting =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>                                        <span class="at">min.node.size =</span> <span class="dv">10</span>)<span class="sc">$</span>ate</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>  res[r, <span class="st">&quot;CF only&quot;</span>]  <span class="ot">&lt;-</span> <span class="fu">forest_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, dat<span class="sc">$</span>Y,</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>                                        <span class="at">num.trees =</span> <span class="dv">500</span>)<span class="sc">$</span>ate</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>  res[r, <span class="st">&quot;Aug only&quot;</span>] <span class="ot">&lt;-</span> <span class="fu">forest_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, dat<span class="sc">$</span>Y, <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>                                        <span class="at">cross.fitting =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>                                        <span class="at">augmented =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>                                        <span class="at">min.node.size =</span> <span class="dv">10</span>)<span class="sc">$</span>ate</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>  res[r, <span class="st">&quot;CF + Aug&quot;</span>] <span class="ot">&lt;-</span> <span class="fu">forest_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, dat<span class="sc">$</span>Y, <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>                                        <span class="at">augmented =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>ate</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>}</span></code></pre></div>
+<table>
+<caption>DGP 2: n = 5,000, p = 20, true ATE = 0, 5 reps.</caption>
+<thead>
+<tr class="header">
+<th align="left">Method</th>
+<th align="right">Bias</th>
+<th align="right">SD</th>
+<th align="right">RMSE</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Standard</td>
+<td align="right">0.1204</td>
+<td align="right">0.0437</td>
+<td align="right">0.1281</td>
+</tr>
+<tr class="even">
+<td align="left">CF only</td>
+<td align="right">0.0151</td>
+<td align="right">0.0673</td>
+<td align="right">0.0690</td>
+</tr>
+<tr class="odd">
+<td align="left">Aug only</td>
+<td align="right">0.0515</td>
+<td align="right">0.0535</td>
+<td align="right">0.0743</td>
+</tr>
+<tr class="even">
+<td align="left">CF + Aug</td>
+<td align="right">0.0055</td>
+<td align="right">0.0609</td>
+<td align="right">0.0611</td>
+</tr>
+</tbody>
+</table>
+<p>The combination of cross-fitting and augmentation (CF + Aug) achieves
+the lowest bias. Cross-fitting alone handles the kernel overfitting,
+while augmentation accounts for outcome variation that the kernel does
+not fully capture. DGP 2 has a rich outcome surface depending on 8
+covariates, of which only 2 are confounders, making the outcome model
+particularly valuable.</p>
+</div>
+<div id="user-supplied-outcome-predictions" class="section level2">
+<h2>User-supplied outcome predictions</h2>
+<p>You can supply your own group-specific outcome predictions via
+<code>mu.hat</code> as a list with components <code>mu1</code>
+(predictions of <span class="math inline">\(E[Y|X, A{=}1]\)</span>) and
+<code>mu0</code> (predictions of <span class="math inline">\(E[Y|X,
+A{=}0]\)</span>):</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">simulate_data</span>(<span class="at">n =</span> <span class="dv">1000</span>, <span class="at">p =</span> <span class="dv">20</span>, <span class="at">ate =</span> <span class="dv">0</span>, <span class="at">dgp =</span> <span class="dv">2</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># Fit your own group-specific outcome models</span></span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>df_all <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">Y =</span> dat<span class="sc">$</span>Y, dat<span class="sc">$</span>X)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>df1 <span class="ot">&lt;-</span> df_all[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">1</span>, ]</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>df0 <span class="ot">&lt;-</span> df_all[dat<span class="sc">$</span>A <span class="sc">==</span> <span class="dv">0</span>, ]</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>lm1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> ., <span class="at">data =</span> df1)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>lm0 <span class="ot">&lt;-</span> <span class="fu">lm</span>(Y <span class="sc">~</span> ., <span class="at">data =</span> df0)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>mu_custom <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>  <span class="at">mu1 =</span> <span class="fu">predict</span>(lm1, <span class="at">newdata =</span> df_all),</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>  <span class="at">mu0 =</span> <span class="fu">predict</span>(lm0, <span class="at">newdata =</span> df_all)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>)</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>fit_custom <span class="ot">&lt;-</span> <span class="fu">forest_balance</span>(dat<span class="sc">$</span>X, dat<span class="sc">$</span>A, dat<span class="sc">$</span>Y, <span class="at">num.trees =</span> <span class="dv">500</span>,</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a>                              <span class="at">mu.hat =</span> mu_custom)</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a>fit_custom</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="co">#&gt; Forest Kernel Energy Balancing (cross-fitted)</span></span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="co">#&gt;   n = 1,000  (n_treated = 505, n_control = 495)</span></span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="co">#&gt;   Trees: 500</span></span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="co">#&gt;   Cross-fitting: 2 folds</span></span>
+<span id="cb4-23"><a href="#cb4-23" tabindex="-1"></a><span class="co">#&gt;   Augmented: yes (doubly-robust)</span></span>
+<span id="cb4-24"><a href="#cb4-24" tabindex="-1"></a><span class="co">#&gt;   Solver: direct</span></span>
+<span id="cb4-25"><a href="#cb4-25" tabindex="-1"></a><span class="co">#&gt;   ATE estimate: 0.1576</span></span>
+<span id="cb4-26"><a href="#cb4-26" tabindex="-1"></a><span class="co">#&gt;   Fold ATEs: 0.2724, 0.0428</span></span>
+<span id="cb4-27"><a href="#cb4-27" tabindex="-1"></a><span class="co">#&gt;   ESS: treated = 391/505 (77%)   control = 380/495 (77%)</span></span>
+<span id="cb4-28"><a href="#cb4-28" tabindex="-1"></a><span class="co">#&gt; -------------------------------------------------- </span></span>
+<span id="cb4-29"><a href="#cb4-29" tabindex="-1"></a><span class="co">#&gt; Use summary() for covariate balance details.</span></span></code></pre></div>
+<p>When <code>mu.hat</code> is supplied with
+<code>cross.fitting = TRUE</code>, the package uses the provided
+predictions as-is and emits a message reminding you to ensure they were
+cross-fitted externally.</p>
+</div>
+<div id="when-to-use-augmentation" class="section level2">
+<h2>When to use augmentation</h2>
+<p>Augmentation is most beneficial when:</p>
+<ul>
+<li><strong>The confounding is nonlinear</strong> and the kernel alone
+cannot fully capture it.</li>
+<li><strong>The outcome model is reasonably accurate</strong>, even if
+not perfectly specified.</li>
+<li><strong>You want robustness</strong> against partial
+misspecification of either the kernel or the outcome model.</li>
+</ul>
+<p>The computational cost of augmentation is modest: fitting two
+additional <code>regression_forest</code> models (one per treatment
+group) per fold, which is typically fast relative to the joint forest
+and kernel construction.</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Robins, J.M., Rotnitzky, A. and Zhao, L.P. (1994). Estimation of
+regression coefficients when some regressors are not always observed.
+<em>Journal of the American Statistical Association</em>, 89(427),
+846–866.</p>
+<p>De, S. and Huling, J.D. (2025). Data adaptive covariate balancing for
+causal effect estimation for high dimensional data. <em>arXiv preprint
+arXiv:2512.18069</em>.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
