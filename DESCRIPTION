@@ -1,6 +1,6 @@
 Package: forestBalance
 Title: Balancing Confounder Distributions with Forest Energy Balancing
-Version: 0.1.0
+Version: 0.1.1
 Authors@R: c(
     person("Jared", "Huling", role = c("aut", "cre"), email = "jaredhuling@gmail.com"),
     person("Simion", "De", role = "aut")
@@ -22,9 +22,9 @@ Suggests: ggplot2, knitr, osqp, rmarkdown, testthat (>= 3.0.0),
         WeightIt
 VignetteBuilder: knitr
 NeedsCompilation: yes
-Packaged: 2026-04-01 12:01:03 UTC; huling
+Packaged: 2026-11-09 18:52:31 UTC; huling
 Author: Jared Huling [aut, cre],
   Simion De [aut]
 Maintainer: Jared Huling <jaredhuling@gmail.com>
 Repository: CRAN
-Date/Publication: 2026-04-07 07:40:15 UTC
+Date/Publication: 2026-11-09 20:20:15 UTC

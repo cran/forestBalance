@@ -10,14 +10,19 @@ forest_balance(
   Y,
   num.trees = 1000,
   min.node.size = NULL,
+  estimand = c("ATE", "ATT", "ATC"),
   cross.fitting = TRUE,
   num.folds = 2,
   augmented = FALSE,
   mu.hat = NULL,
   scale.outcomes = TRUE,
   solver = c("auto", "direct", "cg", "bj"),
+  lambda = 0.1,
+  kernel.response = c("joint", "treatment", "outcome"),
+  crossfit.balance = c("fold", "full"),
   tol = 1e-08,
   parallel = FALSE,
+  maxiter = 2000L,
   ...
 )
 }
@@ -35,6 +40,8 @@ forest_balance(
 \code{max(20, min(floor(n/200) + p, floor(n/50)))}. This scales the leaf
 size with both the sample size and the number of covariates, which
 empirically yields low bias. See Details.}
+
+\item{estimand}{Target estimand: \code{"ATE"} (default), \code{"ATT"}, or \code{"ATC"}.}
 
 \item{cross.fitting}{Logical; if \code{TRUE} (default), use K-fold
 cross-fitting to construct the kernel from held-out data, reducing
@@ -69,6 +76,18 @@ ensures that treatment and outcome contribute equally to the splits.}
 and \code{"cg"} for large fold sizes. See \code{\link{kernel_balance}} for
 details.}
 
+\item{lambda}{Nonnegative ridge penalty on the balancing weights; see
+\code{\link{kernel_balance}}. Default \code{0.1}.}
+
+\item{kernel.response}{Which responses the kernel-defining forest is fit to:
+\code{"joint"} (default; treatment and outcome, the proposed method),
+\code{"treatment"} (treatment only), or \code{"outcome"} (outcome only). The
+latter two exist for ablation studies.}
+
+\item{crossfit.balance}{Under cross-fitting, whether the balancing problem for fold
+\eqn{v} is solved within the fold (\code{"fold"}, default) or on the full sample with
+the kernel learned on the other folds, keeping only fold \eqn{v}'s weights (\code{"full"}).}
+
 \item{tol}{Convergence tolerance for the CG solver. Default is \code{5e-11}.}
 
 \item{parallel}{Logical or integer. If \code{FALSE} (default), folds are
@@ -77,6 +96,8 @@ using all available cores via \code{\link[parallel]{mclapply}}. An integer
 value specifies the exact number of cores. Only used when
 \code{cross.fitting = TRUE}. Note: parallel processing is not supported on
 Windows.}
+
+\item{maxiter}{Maximum iterations for each iterative balancing solve. Default 2000.}
 
 \item{...}{Additional arguments passed to
 \code{\link[grf]{multi_regression_forest}}.}
@@ -97,6 +118,8 @@ cross-fitting is used, these are the concatenated per-fold weights.}
 or \code{NULL} when cross-fitting or the CG solver is used.}
 \item{forest}{The trained forest object. When cross-fitting is used, this
 is the last fold's forest.}
+\item{forests}{All trained forests, one per fold.}
+\item{fold_diagnostics}{Per-fold index maps, complete balancing weights, and solver residual checks. Failed folds are errors.}
 \item{X, A, Y}{The input data.}
 \item{n, n1, n0}{Total, treated, and control sample sizes.}
 \item{solver}{The solver that was used (\code{"direct"} or \code{"cg"}).}

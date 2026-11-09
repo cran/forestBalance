@@ -10,7 +10,9 @@ kernel_balance(
   Z = NULL,
   leaf_matrix = NULL,
   num.trees = NULL,
+  estimand = c("ATE", "ATT", "ATC"),
   solver = c("auto", "direct", "cg", "bj"),
+  lambda = 0.1,
   tol = 1e-08,
   maxiter = 2000L
 )
@@ -40,10 +42,20 @@ back to \code{"cg"} with a warning.}
 \item{num.trees}{Number of trees \eqn{B}. Required when \code{Z} is
 provided.}
 
+\item{estimand}{Target estimand: \code{"ATE"} (default), \code{"ATT"}, or \code{"ATC"}.}
+
 \item{solver}{Which linear solver to use. \code{"auto"} (default) selects
 the best available solver based on the inputs: \code{"cg"} when \code{Z}
 is available and \eqn{n > 5000}, or \code{"direct"} otherwise. See
 Details for solver requirements.}
+
+\item{lambda}{Nonnegative ridge penalty on the weights. The group-\eqn{a} problem
+solved is \eqn{\tfrac12 \| \sum_{i \in S_a} w_i K(X_i,\cdot) - n_a P_n \|^2 + \tfrac{\lambda}{2}\|w_a\|^2}
+subject to \eqn{\sum_{i \in S_a} w_i = n_a}, whose KKT system is
+\eqn{(K_{aa} + \lambda I) w_a = b_a + \gamma_a 1}. Default \code{0.1}. The ridge makes
+the weights unique when the kernel block is singular, which happens when several units
+share leaves in nearly every tree. With \code{lambda = 0} a numerically singular block
+raises an error.}
 
 \item{tol}{Convergence tolerance for iterative solvers. Default is
 \code{1e-8}.}
@@ -57,6 +69,7 @@ A list with the following elements:
 weights. Treated weights sum to \eqn{n_1} and control weights sum to
 \eqn{n_0}.}
 \item{solver}{The solver that was used.}
+\item{diagnostics}{Residuals and convergence checks for every linear solve, arm-total errors, and projected KKT residuals. For positive ridge and a positive semidefinite kernel, the reported weight error bound includes the arm-total correction. Failed accuracy checks raise an error carrying diagnostics.}
 }
 }
 \description{
